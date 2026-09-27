@@ -1,4 +1,4 @@
-lntranl of my ai project 
+<DOCTYPE html>
 <!DOCTYPE html>
 <html lang="hi">
 <head>
