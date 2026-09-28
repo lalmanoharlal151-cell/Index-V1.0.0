@@ -68,6 +68,846 @@ html>
   <footer>
     © 2026 Jyper AI — All Rights Reserved
   </footer>
+<!-- 1. HTML Section -->
+<section class="demo-section">
+  <div class="demo-container">
+    <h2 class="demo-title">A2A Live Communication Demo</h2>
+    <p class="demo-subtitle">देखिए कैसे दो AI एजेंट्स आपस में सुरक्षित तरीके से संवाद करते हैं</p>
+
+    <div class="demo-box">
+      <div class="agent-card">
+        <div class="agent-icon">🤖</div>
+        <h3>Client Agent</h3>
+        <span class="status-badge online">Active</span>
+      </div>
+
+      <div class="data-flow">
+        <div class="pulse-line"></div>
+        <button id="trigger-btn" onclick="runA2ADemo()">Send Request 🚀</button>
+      </div>
+
+      <div class="agent-card">
+        <div class="agent-icon">🧠</div>
+        <h3>Super AI</h3>
+        <span class="status-badge online">Connected</span>
+      </div>
+    </div>
+
+    <!-- Terminal Log Output -->
+    <div class="terminal-window">
+      <div class="terminal-header">
+        <span class="dot red"></span>
+        <span class="dot yellow"></span>
+        <span class="dot green"></span>
+        <span class="terminal-title">A2A Protocol Logs</span>
+      </div>
+      <div class="terminal-body" id="terminal-log">
+        <p class="log-line text-muted">> System ready. Click "Send Request" to test A2A handshake.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. CSS Section -->
+<style>
+.demo-section {
+  padding: 50px 20px;
+  background: rgba(10, 15, 30, 0.6);
+  border-top: 1px solid rgba(0, 242, 254, 0.2);
+  border-bottom: 1px solid rgba(0, 242, 254, 0.2);
+  margin: 40px 0;
+  text-align: center;
+}
+
+.demo-title {
+  font-size: 1.8rem;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.demo-subtitle {
+  color: #a0aec0;
+  font-size: 0.95rem;
+  margin-bottom: 30px;
+}
+
+.demo-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  max-width: 800px;
+  margin: 0 auto 30px auto;
+}
+
+.agent-card {
+  background: #111827;
+  border: 1px solid #1f2937;
+  padding: 20px;
+  border-radius: 12px;
+  width: 160px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.agent-icon {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.agent-card h3 {
+  font-size: 1rem;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.status-badge {
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 20px;
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 1px solid #10b981;
+}
+
+.data-flow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+#trigger-btn {
+  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+  color: #000;
+  font-weight: bold;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#trigger-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.6);
+}
+
+.terminal-window {
+  max-width: 700px;
+  margin: 0 auto;
+  background: #0d1117;
+  border-radius: 8px;
+  border: 1px solid #30363d;
+  text-align: left;
+  overflow: hidden;
+  font-family: monospace;
+}
+
+.terminal-header {
+  background: #161b22;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #30363d;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.red { background: #ff5f56; }
+.yellow { background: #ffbd2e; }
+.green { background: #27c93f; }
+
+.terminal-title {
+  color: #8b949e;
+  font-size: 0.8rem;
+  margin-left: 10px;
+}
+
+.terminal-body {
+  padding: 15px;
+  height: 140px;
+  overflow-y: auto;
+  color: #58a6ff;
+  font-size: 0.85rem;
+}
+
+.log-line {
+  margin: 4px 0;
+}
+.text-muted { color: #8b949e; }
+.text-success { color: #3fb950; }
+.text-warning { color: #d29922; }
+</style>
+
+<!-- 3. JavaScript Section -->
+<script>
+function runA2ADemo() {
+  const btn = document.getElementById("trigger-btn");
+  const logContainer = document.getElementById("terminal-log");
+
+  btn.disabled = true;
+  btn.innerText = "Processing...";
+  logContainer.innerHTML = "";
+
+  const steps = [
+    { text: "> [Client Agent]: Encrypting request payload...", delay: 300, class: "text-muted" },
+    { text: "> [A2A Router]: Handshake initiated via Secure Channel...", delay: 800, class: "text-warning" },
+    { text: "> [Super AI]: Request received. Processing Central Intelligence...", delay: 1400, class: "text-warning" },
+    { text: "> [Super AI]: Response payload signed with Protocol Key.", delay: 2000, class: "text-muted" },
+    { text: "✔ [A2A Network]: Connection Successful! Data Transferred in 24ms.", delay: 2600, class: "text-success" }
+  ];
+
+  steps.forEach((step) => {
+    setTimeout(() => {
+      const p = document.createElement("p");
+      p.className = `log-line ${step.class}`;
+      p.innerText = step.text;
+      logContainer.appendChild(p);
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }, step.delay);
+  });
+
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.innerText = "Send Request 🚀";
+  }, 3000);
+}
+</script>
+<!-- 1. HTML Section -->
+<section class="demo-section">
+  <div class="demo-container">
+    <h2 class="demo-title">A2A Live Communication Demo</h2>
+    <p class="demo-subtitle">देखिए कैसे दो AI एजेंट्स आपस में सुरक्षित तरीके से संवाद करते हैं</p>
+
+    <div class="demo-box">
+      <div class="agent-card">
+        <div class="agent-icon">🤖</div>
+        <h3>Client Agent</h3>
+        <span class="status-badge online">Active</span>
+      </div>
+
+      <div class="data-flow">
+        <div class="pulse-line"></div>
+        <button id="trigger-btn" onclick="runA2ADemo()">Send Request 🚀</button>
+      </div>
+
+      <div class="agent-card">
+        <div class="agent-icon">🧠</div>
+        <h3>Super AI</h3>
+        <span class="status-badge online">Connected</span>
+      </div>
+    </div>
+
+    <!-- Terminal Log Output -->
+    <div class="terminal-window">
+      <div class="terminal-header">
+        <span class="dot red"></span>
+        <span class="dot yellow"></span>
+        <span class="dot green"></span>
+        <span class="terminal-title">A2A Protocol Logs</span>
+      </div>
+      <div class="terminal-body" id="terminal-log">
+        <p class="log-line text-muted">> System ready. Click "Send Request" to test A2A handshake.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. CSS Section -->
+<style>
+.demo-section {
+  padding: 50px 20px;
+  background: rgba(10, 15, 30, 0.6);
+  border-top: 1px solid rgba(0, 242, 254, 0.2);
+  border-bottom: 1px solid rgba(0, 242, 254, 0.2);
+  margin: 40px 0;
+  text-align: center;
+}
+
+.demo-title {
+  font-size: 1.8rem;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.demo-subtitle {
+  color: #a0aec0;
+  font-size: 0.95rem;
+  margin-bottom: 30px;
+}
+
+.demo-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  max-width: 800px;
+  margin: 0 auto 30px auto;
+}
+
+.agent-card {
+  background: #111827;
+  border: 1px solid #1f2937;
+  padding: 20px;
+  border-radius: 12px;
+  width: 160px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.agent-icon {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.agent-card h3 {
+  font-size: 1rem;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.status-badge {
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 20px;
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 1px solid #10b981;
+}
+
+.data-flow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+#trigger-btn {
+  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+  color: #000;
+  font-weight: bold;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#trigger-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.6);
+}
+
+.terminal-window {
+  max-width: 700px;
+  margin: 0 auto;
+  background: #0d1117;
+  border-radius: 8px;
+  border: 1px solid #30363d;
+  text-align: left;
+  overflow: hidden;
+  font-family: monospace;
+}
+
+.terminal-header {
+  background: #161b22;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #30363d;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.red { background: #ff5f56; }
+.yellow { background: #ffbd2e; }
+.green { background: #27c93f; }
+
+.terminal-title {
+  color: #8b949e;
+  font-size: 0.8rem;
+  margin-left: 10px;
+}
+
+.terminal-body {
+  padding: 15px;
+  height: 140px;
+  overflow-y: auto;
+  color: #58a6ff;
+  font-size: 0.85rem;
+}
+
+.log-line {
+  margin: 4px 0;
+}
+.text-muted { color: #8b949e; }
+.text-success { color: #3fb950; }
+.text-warning { color: #d29922; }
+</style>
+
+<!-- 3. JavaScript Section -->
+<script>
+function runA2ADemo() {
+  const btn = document.getElementById("trigger-btn");
+  const logContainer = document.getElementById("terminal-log");
+
+  btn.disabled = true;
+  btn.innerText = "Processing...";
+  logContainer.innerHTML = "";
+
+  const steps = [
+    { text: "> [Client Agent]: Encrypting request payload...", delay: 300, class: "text-muted" },
+    { text: "> [A2A Router]: Handshake initiated via Secure Channel...", delay: 800, class: "text-warning" },
+    { text: "> [Super AI]: Request received. Processing Central Intelligence...", delay: 1400, class: "text-warning" },
+    { text: "> [Super AI]: Response payload signed with Protocol Key.", delay: 2000, class: "text-muted" },
+    { text: "✔ [A2A Network]: Connection Successful! Data Transferred in 24ms.", delay: 2600, class: "text-success" }
+  ];
+
+  steps.forEach((step) => {
+    setTimeout(() => {
+      const p = document.createElement("p");
+      p.className = `log-line ${step.class}`;
+      p.innerText = step.text;
+      logContainer.appendChild(p);
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }, step.delay);
+  });
+
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.innerText = "Send Request 🚀";
+  }, 3000);
+}
+</script>
+<!-- 1. HTML Section -->
+<section class="demo-section">
+  <div class="demo-container">
+    <h2 class="demo-title">A2A Live Communication Demo</h2>
+    <p class="demo-subtitle">देखिए कैसे दो AI एजेंट्स आपस में सुरक्षित तरीके से संवाद करते हैं</p>
+
+    <div class="demo-box">
+      <div class="agent-card">
+        <div class="agent-icon">🤖</div>
+        <h3>Client Agent</h3>
+        <span class="status-badge online">Active</span>
+      </div>
+
+      <div class="data-flow">
+        <div class="pulse-line"></div>
+        <button id="trigger-btn" onclick="runA2ADemo()">Send Request 🚀</button>
+      </div>
+
+      <div class="agent-card">
+        <div class="agent-icon">🧠</div>
+        <h3>Super AI</h3>
+        <span class="status-badge online">Connected</span>
+      </div>
+    </div>
+
+    <!-- Terminal Log Output -->
+    <div class="terminal-window">
+      <div class="terminal-header">
+        <span class="dot red"></span>
+        <span class="dot yellow"></span>
+        <span class="dot green"></span>
+        <span class="terminal-title">A2A Protocol Logs</span>
+      </div>
+      <div class="terminal-body" id="terminal-log">
+        <p class="log-line text-muted">> System ready. Click "Send Request" to test A2A handshake.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. CSS Section -->
+<style>
+.demo-section {
+  padding: 50px 20px;
+  background: rgba(10, 15, 30, 0.6);
+  border-top: 1px solid rgba(0, 242, 254, 0.2);
+  border-bottom: 1px solid rgba(0, 242, 254, 0.2);
+  margin: 40px 0;
+  text-align: center;
+}
+
+.demo-title {
+  font-size: 1.8rem;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.demo-subtitle {
+  color: #a0aec0;
+  font-size: 0.95rem;
+  margin-bottom: 30px;
+}
+
+.demo-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  max-width: 800px;
+  margin: 0 auto 30px auto;
+}
+
+.agent-card {
+  background: #111827;
+  border: 1px solid #1f2937;
+  padding: 20px;
+  border-radius: 12px;
+  width: 160px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.agent-icon {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.agent-card h3 {
+  font-size: 1rem;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.status-badge {
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 20px;
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 1px solid #10b981;
+}
+
+.data-flow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+#trigger-btn {
+  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+  color: #000;
+  font-weight: bold;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#trigger-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.6);
+}
+
+.terminal-window {
+  max-width: 700px;
+  margin: 0 auto;
+  background: #0d1117;
+  border-radius: 8px;
+  border: 1px solid #30363d;
+  text-align: left;
+  overflow: hidden;
+  font-family: monospace;
+}
+
+.terminal-header {
+  background: #161b22;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #30363d;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.red { background: #ff5f56; }
+.yellow { background: #ffbd2e; }
+.green { background: #27c93f; }
+
+.terminal-title {
+  color: #8b949e;
+  font-size: 0.8rem;
+  margin-left: 10px;
+}
+
+.terminal-body {
+  padding: 15px;
+  height: 140px;
+  overflow-y: auto;
+  color: #58a6ff;
+  font-size: 0.85rem;
+}
+
+.log-line {
+  margin: 4px 0;
+}
+.text-muted { color: #8b949e; }
+.text-success { color: #3fb950; }
+.text-warning { color: #d29922; }
+</style>
+
+<!-- 3. JavaScript Section -->
+<script>
+function runA2ADemo() {
+  const btn = document.getElementById("trigger-btn");
+  const logContainer = document.getElementById("terminal-log");
+
+  btn.disabled = true;
+  btn.innerText = "Processing...";
+  logContainer.innerHTML = "";
+
+  const steps = [
+    { text: "> [Client Agent]: Encrypting request payload...", delay: 300, class: "text-muted" },
+    { text: "> [A2A Router]: Handshake initiated via Secure Channel...", delay: 800, class: "text-warning" },
+    { text: "> [Super AI]: Request received. Processing Central Intelligence...", delay: 1400, class: "text-warning" },
+    { text: "> [Super AI]: Response payload signed with Protocol Key.", delay: 2000, class: "text-muted" },
+    { text: "✔ [A2A Network]: Connection Successful! Data Transferred in 24ms.", delay: 2600, class: "text-success" }
+  ];
+
+  steps.forEach((step) => {
+    setTimeout(() => {
+      const p = document.createElement("p");
+      p.className = `log-line ${step.class}`;
+      p.innerText = step.text;
+      logContainer.appendChild(p);
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }, step.delay);
+  });
+
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.innerText = "Send Request 🚀";
+  }, 3000);
+}
+</script>
+<!-- 1. HTML Section -->
+<section class="demo-section">
+  <div class="demo-container">
+    <h2 class="demo-title">A2A Live Communication Demo</h2>
+    <p class="demo-subtitle">देखिए कैसे दो AI एजेंट्स आपस में सुरक्षित तरीके से संवाद करते हैं</p>
+
+    <div class="demo-box">
+      <div class="agent-card">
+        <div class="agent-icon">🤖</div>
+        <h3>Client Agent</h3>
+        <span class="status-badge online">Active</span>
+      </div>
+
+      <div class="data-flow">
+        <div class="pulse-line"></div>
+        <button id="trigger-btn" onclick="runA2ADemo()">Send Request 🚀</button>
+      </div>
+
+      <div class="agent-card">
+        <div class="agent-icon">🧠</div>
+        <h3>Super AI</h3>
+        <span class="status-badge online">Connected</span>
+      </div>
+    </div>
+
+    <!-- Terminal Log Output -->
+    <div class="terminal-window">
+      <div class="terminal-header">
+        <span class="dot red"></span>
+        <span class="dot yellow"></span>
+        <span class="dot green"></span>
+        <span class="terminal-title">A2A Protocol Logs</span>
+      </div>
+      <div class="terminal-body" id="terminal-log">
+        <p class="log-line text-muted">> System ready. Click "Send Request" to test A2A handshake.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. CSS Section -->
+<style>
+.demo-section {
+  padding: 50px 20px;
+  background: rgba(10, 15, 30, 0.6);
+  border-top: 1px solid rgba(0, 242, 254, 0.2);
+  border-bottom: 1px solid rgba(0, 242, 254, 0.2);
+  margin: 40px 0;
+  text-align: center;
+}
+
+.demo-title {
+  font-size: 1.8rem;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.demo-subtitle {
+  color: #a0aec0;
+  font-size: 0.95rem;
+  margin-bottom: 30px;
+}
+
+.demo-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  max-width: 800px;
+  margin: 0 auto 30px auto;
+}
+
+.agent-card {
+  background: #111827;
+  border: 1px solid #1f2937;
+  padding: 20px;
+  border-radius: 12px;
+  width: 160px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.agent-icon {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.agent-card h3 {
+  font-size: 1rem;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.status-badge {
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 20px;
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 1px solid #10b981;
+}
+
+.data-flow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+#trigger-btn {
+  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+  color: #000;
+  font-weight: bold;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#trigger-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.6);
+}
+
+.terminal-window {
+  max-width: 700px;
+  margin: 0 auto;
+  background: #0d1117;
+  border-radius: 8px;
+  border: 1px solid #30363d;
+  text-align: left;
+  overflow: hidden;
+  font-family: monospace;
+}
+
+.terminal-header {
+  background: #161b22;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #30363d;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.red { background: #ff5f56; }
+.yellow { background: #ffbd2e; }
+.green { background: #27c93f; }
+
+.terminal-title {
+  color: #8b949e;
+  font-size: 0.8rem;
+  margin-left: 10px;
+}
+
+.terminal-body {
+  padding: 15px;
+  height: 140px;
+  overflow-y: auto;
+  color: #58a6ff;
+  font-size: 0.85rem;
+}
+
+.log-line {
+  margin: 4px 0;
+}
+.text-muted { color: #8b949e; }
+.text-success { color: #3fb950; }
+.text-warning { color: #d29922; }
+</style>
+
+<!-- 3. JavaScript Section -->
+<script>
+function runA2ADemo() {
+  const btn = document.getElementById("trigger-btn");
+  const logContainer = document.getElementById("terminal-log");
+
+  btn.disabled = true;
+  btn.innerText = "Processing...";
+  logContainer.innerHTML = "";
+
+  const steps = [
+    { text: "> [Client Agent]: Encrypting request payload...", delay: 300, class: "text-muted" },
+    { text: "> [A2A Router]: Handshake initiated via Secure Channel...", delay: 800, class: "text-warning" },
+    { text: "> [Super AI]: Request received. Processing Central Intelligence...", delay: 1400, class: "text-warning" },
+    { text: "> [Super AI]: Response payload signed with Protocol Key.", delay: 2000, class: "text-muted" },
+    { text: "✔ [A2A Network]: Connection Successful! Data Transferred in 24ms.", delay: 2600, class: "text-success" }
+  ];
+
+  steps.forEach((step) => {
+    setTimeout(() => {
+      const p = document.createElement("p");
+      p.className = `log-line ${step.class}`;
+      p.innerText = step.text;
+      logContainer.appendChild(p);
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }, step.delay);
+  });
+
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.innerText = "Send Request 🚀";
+  }, 3000);
+}
+</script>
 
 </body>
 </html>
