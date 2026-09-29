@@ -1,10 +1,38 @@
-html lang="hi">
+<!DOCTYPE html>
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexa A2A - Super AI Connectivity Map</title>
+    <title>Nexa A2A - Connecting Super AI</title>
+    
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #080B10;
+            --card-bg: rgba(18, 25, 38, 0.8);
+            --neon-blue: #00f3ff;
+            --neon-purple: #9d00ff;
+            --text-color: #e2e8f0;
+            --text-muted: #94a3b8;
+        }
+
+       u * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Rajdhani', sans-serif;
+        }
+    </style>
 </head>
-<body
+<body>
+
+    <!-- आपका बॉडी कंटेंट यहाँ आएगा -->
+
+</body>
+</html>
+ty
 
     <meta charset="UTF-8">
     meta name="viewport" content="width=device-width, initial-scale=1.0">
