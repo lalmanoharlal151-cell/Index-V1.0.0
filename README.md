@@ -161,3 +161,22 @@ def connect_agent():
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
+<!-- AI Agent Connection Modal (पुराने UI के ठीक नीचे चिपकाएँ) -->
+<div id="agentModal" class="modal-overlay" style="display: none;">
+  <div class="modal-content">
+    <h3>Connect AI Agent</h3>
+    <label for="agentType">Select Agent Type:</label>
+    <select id="agentType">
+      <option value="gemini">Gemini AI Agent</option>
+      <option value="custom">Custom A2A Protocol Agent</option>
+    </select>
+
+    <label for="apiKey">API Key / Agent Endpoint:</label>
+    <input type="text" id="apiKey" placeholder="Enter API Key or Endpoint URL">
+
+    <div class="modal-actions">
+      <button onclick="connectAgent()" class="btn-submit">Connect</button>
+      <button onclick="closeAgentModal()" class="btn-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
