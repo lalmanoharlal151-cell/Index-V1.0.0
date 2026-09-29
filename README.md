@@ -1,7 +1,12 @@
-<DOCTYPE html>
 <!DOCTYPE html>
 <html lang="hi">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexa A2A - Super AI Connectivity Map</title>
+</head>
+<body>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nexa A2A - Connecting Super AI | India's #1 AI Platform</title>
