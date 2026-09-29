@@ -180,3 +180,32 @@ if __name__ == '__main__':
     </div>
   </div>
 </div>
+# ==========================================
+# Nexa A2A - Flask Server & Protocol Logic
+# ==========================================
+
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+class NexaA2AProtocol:
+    def __init__(self, sender_id, receiver_id, payload_type, data):
+        self.sender_id = sender_id
+        self.receiver_id = receiver_id
+        self.payload_type = payload_type  # 'command', 'data', 'status'
+        self.data = data
+
+@app.route('/api/a2a-connect', methods=['POST'])
+def connect_agent():
+    req_data = request.get_json()
+    agent_type = req_data.get('agent_type')
+    api_key = req_data.get('api_key')
+    
+    return jsonify({
+        "status": "success", 
+        "message": "Agent connected successfully",
+        "agent_type": agent_type
+    })
+
+if __name__ == '__main__':
+    app.run(port=5000, debug=True)
