@@ -14,6 +14,7 @@
             --card-bg: rgba(18, 25, 38, 0.8);
             --neon-blue: #00f3ff;
     
+   
             --neon-purple: #9d00ff;
             --text-color: #e2e8f0;
             --text-muted: #94a3b8;
@@ -339,4 +340,5 @@ ty
 
 </body>
 </html>
+
 
