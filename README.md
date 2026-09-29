@@ -320,7 +320,5 @@ lang="hi">
         <p>&copy; 2026 Nexa A2A Project. Made in India for the Future of AI.</p>
     </footer>
 
-</body>
-</html>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
