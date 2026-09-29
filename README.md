@@ -1,6 +1,5 @@
-<!DOCTYPE html>
-<html lang="hi">
-<head>
+
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nexa A2A - Super AI Connectivity Map</title>
@@ -8,7 +7,7 @@
 <body>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nexa A2A - Connecting Super AI | India's #1 AI Platform</title>
     <!-- Google Fonts & Font Awesome Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
