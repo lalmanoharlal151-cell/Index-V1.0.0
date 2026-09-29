@@ -119,3 +119,45 @@
   </script>
 </body>
 </html>
+# app.py (Python Flask Server Logic)
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+# A2A Message Protocol Schema
+class NexaA2AProtocol:
+    def __init__(self, sender_id, receiver_id, payload_type, data):
+        self.sender_id = sender_id
+        self.receiver_id = receiver_id
+        self.payload_type = payload_type # 'command', 'data', 'status'
+        self.data = data
+
+    def to_dict(self):
+        return {
+            "protocol": "Nexa-A2A-v1.0",
+            "sender": self.sender_id,
+            "receiver": self.receiver_id,
+            "payload_type": self.payload_type,
+            "payload": self.data
+        }
+
+@app.route('/api/a2a-connect', methods=['POST'])
+def connect_agent():
+    req_data = request.get_json()
+    agent_type = req_data.get('agent_type')
+    api_key = req_data.get('api_key')
+
+    if api_key:
+        # Handshake successful
+        handshake = NexaA2AProtocol(
+            sender_id="Nexa-Core-SuperAI",
+            receiver_id=agent_type,
+            payload_type="status",
+            data={"status": "CONNECTED", "handshake": True}
+        )
+        return jsonify({"status": "success", "protocol": handshake.to_dict()}), 200
+    
+    return jsonify({"status": "error", "message": "Invalid credentials"}), 400
+
+if __name__ == '__main__':
+    app.run(port=5000, debug=True)
