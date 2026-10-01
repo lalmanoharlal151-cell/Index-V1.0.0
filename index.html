@@ -1,1 +1,92 @@
 
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexa AI</title>
+    <style>
+        /* CSS Styling */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #1e293b;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #38bdf8;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        p {
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #0284c7;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0369a1;
+        }
+
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #0f172a;
+            border-radius: 8px;
+            color: #38bdf8;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Nexa AI System</h1>
+        <p>A2A (Agent-to-Agent) Protocol Integration Panel</p>
+        <button id="actionBtn">सिस्टम स्थिति जांचें</button>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        // JavaScript Logic
+        document.getElementById('actionBtn').addEventListener('click', function() {
+            const outputDiv = document.getElementById('output');
+            outputDiv.style.display = 'block';
+            outputDiv.innerHTML = '⚡ Nexa AI एजेंट सफलतापूर्वक कनेक्ट हो गया है!';
+        });
+    </script>
+
+</body>
+</html>
