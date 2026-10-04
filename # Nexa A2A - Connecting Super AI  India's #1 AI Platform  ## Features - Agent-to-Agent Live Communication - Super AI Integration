@@ -197,3 +197,43 @@ body {
         agent2Output.innerHTML = '<p class="muted">Awaiting protocol handshake...</p>';
     });
 </script>
+<script>
+  // Gemini API सेटअप
+  const apiKey = "YOUR_API_KEY"; // यहाँ अपनी Google AI Studio की API Key डालें
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+  async function callGeminiAPI(promptText) {
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{ text: promptText }]
+          }]
+        })
+      });
+
+      const data = await response.json();
+      if (data.candidates && data.candidates.length > 0) {
+        return data.candidates[0].content.parts[0].text;
+      } else {
+        return "क्षमा करें, कोई उत्तर नहीं मिला।";
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+      -return "कनेक्शन में कोई समस्या है।";
+    }
+  }
+
+  // एजेंट बटन का उदाहरण (जब आप 'Initialize Agents' पर क्लिक करेंगे)
+  document.getElementById("start-btn").addEventListener("click", async () => {
+    const agentOutput = document.getElementById("agent-1-output");
+    agentOutput.innerHTML = "एआई से संपर्क किया जा रहा है...";
+    
+    const aiResponse = await callGeminiAPI("नमस्ते! Nexa A2A सिस्टम शुरू हो चुका है, अपनी स्थिति बताएं।");
+    agentOutput.innerHTML = aiResponse;
+  });
+</script>
