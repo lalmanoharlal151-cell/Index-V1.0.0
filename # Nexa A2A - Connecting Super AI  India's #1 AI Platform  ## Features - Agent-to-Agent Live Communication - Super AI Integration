@@ -107,3 +107,19 @@ body {
 .muted {
     color: #94a3b8;
 }
+<script>
+    const startBtn = document.getElementById('start-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const agent1Output = document.getElementById('agent-1-output');
+
+    startBtn.addEventListener('click', () => {
+        agent1Output.innerHTML = '<p style="color: #a855f7;">Initializing Agent-to-Agent handshake...</p>';
+        setTimeout(() => {
+            agent1Output.innerHTML += '<p style="color: #22c55e;">✔ Connection established with Agent Beta (Integration Node). Super AI protocol active.</p>';
+        }, 1500);
+    });
+
+    resetBtn.addEventListener('click', () => {
+        agent1Output.innerHTML = '<p class="muted">Waiting for synchronization...</p>';
+    });
+</script>
