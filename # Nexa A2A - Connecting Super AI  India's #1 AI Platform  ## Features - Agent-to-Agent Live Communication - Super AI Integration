@@ -319,16 +319,27 @@
     </header>
 <body>
 
-    <!-- Header / Navbar -->
-    <header>
-        <div class="logo">
-            <h2>Nexa A2A</h2>
-            <span>Super AI Integration</span>
-        </div>
-        <div class="status-badge">
-            <span class="dot"></span> Live Connection
-        </div>
-    </header>
+  
+
+        
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
 
     <!-- Main Container -->
     <main class="dashboard-container">
