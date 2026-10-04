@@ -123,3 +123,10 @@ body {
         agent1Output.innerHTML = '<p class="muted">Waiting for synchronization...</p>';
     });
 </script>
+<!-- Agent 2 Card -->
+<div class="agent-card">
+    <h4>Agent Beta (Integration Node)</h4>
+    <div class="chat-box" id="agent-2-output">
+        <p class="muted">Awaiting protocol handshake...</p>
+    </div>
+</div>
