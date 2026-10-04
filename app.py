@@ -37,4 +37,46 @@ def chat():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+from flask import Flask, request, jsonify
+from openai import OpenAI
+
+app = Flask(__name__)
+
+# अपनी OpenAI API Key यहाँ दर्ज करें
+client = OpenAI(api_key="YOUR_OPENAI_API_KEY")
+
+@app.route('/api/chat', methods=['POST'])
+def chat_api():
+    try:
+        data = request.json
+        user_message = data.get('message', '')
+        
+        if not user_message:
+            return jsonify({"success": False, "error": "मैसेज खाली नहीं हो सकता।"}), 400
+
+        # चैटजीपीटी API को कॉल करना
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system", 
+                    "content": "You are Nexa AI, an advanced Agent-to-Agent (A2A) protocol assistant."
+                },
+                {
+                    "role": "user", 
+                    "content": user_message
+                }
+            ],
+            temperature=0.7
+        )
+        
+        reply = response.choices[0].message.content
+        return jsonify({"success": True, "reply": reply})
+        
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+if __name__ == '__main__':
+    # सर्वर को लोकल होस्ट पर शुरू करें
+    app.run(host='0.0.0.0', port=5000, debug=True)
 
