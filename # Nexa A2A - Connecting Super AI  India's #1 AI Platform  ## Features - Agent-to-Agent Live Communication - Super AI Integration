@@ -130,3 +130,24 @@ body {
         <p class="muted">Awaiting protocol handshake...</p>
     </div>
 </div>
+<script>
+    const startBtn = document.getElementById('start-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const agent1Output = document.getElementById('agent-1-output');
+    const agent2Output = document.getElementById('agent-2-output');
+
+    startBtn.addEventListener('click', () => {
+        agent1Output.innerHTML = '<p style="color: #a855f7;">Initializing Agent-to-Agent handshake...</p>';
+        agent2Output.innerHTML = '<p class="muted">Listening for incoming node...</p>';
+
+        setTimeout(() => {
+            agent1Output.innerHTML += '<p style="color: #22c55e;">✔ Handshake successful with Agent Beta.</p>';
+            agent2Output.innerHTML = '<p style="color: #22c55e;">✔ Connected to Agent Alpha. Super AI active.</p>';
+        }, 1500);
+    });
+
+    resetBtn.addEventListener('click', () => {
+        agent1Output.innerHTML = '<p class="muted">Waiting for synchronization...</p>';
+        agent2Output.innerHTML = '<p class="muted">Awaiting protocol handshake...</p>';
+    });
+</script>
