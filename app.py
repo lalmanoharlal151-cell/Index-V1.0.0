@@ -108,3 +108,46 @@ def chat():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
+from flask import Flask, jsonify, request
+import datetime
+
+app = Flask(__name__)
+
+# Nexa AI एजेंट की शुरुआती स्थिति (Status)
+agent_status = {
+    "agent_name": "Nexa AI Agent",
+    "status": "Connected",
+    "protocol": "Agent-to-Agent (A2A)",
+    "last_checked": str(datetime.datetime.now())
+}
+
+@app.route('/')
+def home():
+    return jsonify({
+        "message": "Nexa AI एजेंट सफलतापूर्वक कनेक्ट हो गया है!",
+        "system_status": "Active"
+    })
+
+# सिस्टम स्थिति जाँचने (System Status Check) का एंडपॉइंट
+@app.route('/status', methods=['GET'])
+def check_status():
+    agent_status["last_checked"] = str(datetime.datetime.now())
+    return jsonify(agent_status)
+
+# डेटा रिसीव या A2A कम्युनिकेट करने के लिए
+@app.route('/a2a-sync', methods=['POST'])
+def a2a_sync():
+    data = request.json
+    # यहाँ आप अपने लॉजिक या AI रिस्पॉन्सेस को जोड़ सकते हैं
+    incoming_message = data.get("message", "No message received")
+    
+    response_payload = {
+        "status": "success",
+        "processed_message": incoming_message,
+        "reply": "Nexa AI ने आपका डेटा सफलतापूर्वक प्रोसेस कर लिया है।"
+    }
+    return jsonify(response_payload)
+
+if __name__ == '__main__':
+    # लोकल होस्ट पर सर्वर रन करें (पोर्ट 5000 पर)
+    app.run(host='0.0.0.0', port=5000, debug=True)
