@@ -303,3 +303,17 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexa A2A - Super AI Live Communication</title>
+</head>
+<body>
+    <!-- Header / Navbar -->
+    <header style="display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; border-bottom: 1px solid rgba(0, 243, 255, 0.2);">
+        <div class="logo" style="font-size: 22px; font-weight: bold; color: var(--neon-blue);">
+            NEXA <span style="color: var(--neon-purple);">A2A</span>
+        </div>
+        <div class="status-indicator" style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-muted);">
+            <span style="width: 10px; height: 10px; background-color: #00ff66; border-radius: 50%; box-shadow: 0 0 8px #00ff66;"></span>
+            Agents Live & Connected
+        </div>
+    </header>
