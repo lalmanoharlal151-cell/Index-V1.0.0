@@ -317,3 +317,51 @@
             Agents Live & Connected
         </div>
     </header>
+<body>
+
+    <!-- Header / Navbar -->
+    <header>
+        <div class="logo">
+            <h2>Nexa A2A</h2>
+            <span>Super AI Integration</span>
+        </div>
+        <div class="status-badge">
+            <span class="dot"></span> Live Connection
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="dashboard-container">
+        
+        <!-- Control Panel Section -->
+        <section class="control-panel">
+            <h3>Agent Command Center</h3>
+            <p>Manage and monitor real-time Agent-to-Agent communication protocols.</p>
+            <div class="button-group">
+                <button id="start-btn" class="neon-btn">Initialize Agents</button>
+                <button id="reset-btn" class="secondary-btn">Reset Protocol</button>
+            </div>
+        </section>
+
+        <!-- Live Communication Grid -->
+        <section class="chat-grid">
+            <!-- Agent 1 Card -->
+            <div class="agent-card">
+                <h4>Agent Alpha (Primary AI)</h4>
+                <div class="chat-box" id="agent-1-output">
+                    <p class="muted">Waiting for synchronization...</p>
+                </div>
+            </div>
+
+            <!-- Agent 2 Card -->
+            <div class="agent-card">
+                <h4>Agent Beta (Integration Node)</h4>
+                <div class="chat-box" id="agent-2-output">
+                    <p class="muted">Standby for response...</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+</body>
