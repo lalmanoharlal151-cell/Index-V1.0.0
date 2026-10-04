@@ -80,3 +80,31 @@ if __name__ == '__main__':
     # सर्वर को लोकल होस्ट पर शुरू करें
     app.run(host='0.0.0.0', port=5000, debug=True)
 
+import os
+from flask import Flask, request, jsonify
+from openai import OpenAI
+
+app = Flask(__name__)
+
+# OpenAI क्लाइंट सेट करें (अपनी API की यहाँ डाल सकते हैं या पर्यावरण वेरिएबल सेट कर सकते हैं)
+client = OpenAI(api_key="YOUR_OPENAI_API_KEY")
+
+@app.route('/')
+def home():
+    return "Nexa AI Server is Running!"
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    user_data = request.json
+    prompt_text = user_data.get("prompt", "")
+
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "user", "content": prompt_text}]
+    )
+
+    ai_reply = response.choices[0].message.content
+    return jsonify({"response": ai_reply})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
