@@ -1,1 +1,159 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexa Agent Connect</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #38bdf8;
+            --text-color: #f8fafc;
+            --text-secondary: #94a3b8;
+        }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        header {
+            background-color: var(--card-bg);
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid #334155;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            letter-spacing: 1px;
+        }
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+        .chat-box {
+            flex: 1;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1rem;
+            overflow-y: auto;
+            border: 1px solid #334155;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .message {
+            padding: 10px 14px;
+            border-radius: 8px;
+            max-width: 75%;
+            line-height: 1.4;
+        }
+        .user-msg {
+            background-color: #0284c7;
+            align-self: flex-end;
+        }
+        .agent-msg {
+            background-color: #334155;
+            align-self: flex-start;
+            border-left: 3px solid var(--accent-color);
+        }
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #475569;
+            background-color: #0f172a;
+            color: white;
+            font-size: 1rem;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        button {
+            padding: 0 20px;
+            background-color: var(--accent-color);
+            color: #0f172a;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Nexa Agent Connect</h1>
+    </header>
+
+    <div class="container">
+        <div class="chat-box" id="chatBox">
+            <div class="message agent-msg">नमस्कार! Nexa Agent Connect में आपका स्वागत है। मैं आपकी किस प्रकार सहायता कर सकता हूँ?</div>
+        </div>
+        
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="यहाँ अपना संदेश लिखें..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">भेजें</button>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            const inputField = document.getElementById('userInput');
+            const chatBox = document.getElementById('chatBox');
+            const messageText = inputField.value.trim();
+
+            if (messageText === '') return;
+
+            // यूजर का मैसेज जोड़ें
+            const userDiv = document.createElement('div');
+            userDiv.className = 'message user-msg';
+            userDiv.textContent = messageText;
+            chatBox.appendChild(userDiv);
+
+            inputField.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // ऑटो-रिस्पांस सिमुलेशन (बाद में इसे Flask या Gemini API से जोड़ सकते हैं)
+            setTimeout(() => {
+                const agentDiv = document.createElement('div');
+                agentDiv.className = 'message agent-msg';
+                agentDiv.textContent = "सिस्टम कनेक्टेड है: आपके इनपुट पर प्रक्रिया जारी है।";
+                chatBox.appendChild(agentDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 1000);
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+    </script>
+
+</body>
+</html>
 
