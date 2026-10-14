@@ -151,3 +151,14 @@ def a2a_sync():
 if __name__ == '__main__':
     # लोकल होस्ट पर सर्वर रन करें (पोर्ट 5000 पर)
     app.run(host='0.0.0.0', port=5000, debug=True)
+
+# Razorpay Client सेट करें
+razorpay_client = razorpay.Client(
+    auth=("आपकी_KEY_ID_यहाँ_लिखें", "आपकी_KEY_SECRET_यहाँ_लिखें")
+)
+
+
+# ऑर्डर क्रिएट करने का रूट (Route)
+@app.route("/create_order", methods=["POST"])
+def create_order():
+    amount = 50000
