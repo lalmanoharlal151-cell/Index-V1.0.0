@@ -181,6 +181,108 @@ def get_ai_content_hub():
             "agent": "ContentCreator-Bot",
             "content": "Automated blogging, market analysis, code refactoring, and smart IoT device alerts.",
             "time": "10 mins ago"
-        }
-    ]
+        }from flask import Flask, jsonify, request
+
+app = Flask(__name__)
+
+# अस्थायी रूप से मैसेजेस को स्टोर करने के लिए इन-मेमोरी लिस्ट (बाद में डेटाबेस जोड़ सकते हैं)
+message_store = []
+
+
+@app.route("/api/agent/message", methods=["POST"])
+def send_agent_message():
+  data = request.get_json()
+
+  # आवश्यक फील्ड्स की जांच करें
+  required_fields = ["sender_id", "receiver_id", "task", "payload"]
+  if not data or not all(field in data for field in required_fields):
+    return (
+        jsonify({
+            "error": "Invalid payload. Required: sender_id, receiver_id, task,"
+            " payload"
+        }),
+        400,
+    )
+
+  # मैसेज ऑब्जेक्ट बनाएं
+  message_packet = {
+      "sender_id": data["sender_id"],
+      "receiver_id": data["receiver_id"],
+      "task": data["task"],
+      "payload": data["payload"],
+      "status": "received",
+  }
+
+  message_store.append(message_packet)
+
+  return (
+      jsonify({
+          "status": "success",
+          "message": "Agent message processed successfully",
+          "data": message_packet,
+      }),
+      200,
+  )
+
+
+@app.route("/api/agent/messages", methods=["GET"])
+def get_messages():
+  return jsonify({"messages": message_store}), 200
+
+
+if __name__ == "__main__":
+  app.run(host="0.0.0.0", port=5000, debug=True)
+
+  from flask import Flask, jsonify, request
+
+app = Flask(__name__)
+
+# अस्थायी रूप से मैसेजेस को स्टोर करने के लिए इन-मेमोरी लिस्ट (बाद में डेटाबेस जोड़ सकते हैं)
+message_store = []
+
+
+@app.route("/api/agent/message", methods=["POST"])
+def send_agent_message():
+  data = request.get_json()
+
+  # आवश्यक फील्ड्स की जांच करें
+  required_fields = ["sender_id", "receiver_id", "task", "payload"]
+  if not data or not all(field in data for field in required_fields):
+    return (
+        jsonify({
+            "error": "Invalid payload. Required: sender_id, receiver_id, task,"
+            " payload"
+        }),
+        400,
+    )
+
+  # मैसेज ऑब्जेक्ट बनाएं
+  message_packet = {
+      "sender_id": data["sender_id"],
+      "receiver_id": data["receiver_id"],
+      "task": data["task"],
+      "payload": data["payload"],
+      "status": "received",
+  }
+
+  message_store.append(message_packet)
+
+  return (
+      jsonify({
+          "status": "success",
+          "message": "Agent message processed successfully",
+          "data": message_packet,
+      }),
+      200,
+  )
+
+
+@app.route("/api/agent/messages", methods=["GET"])
+def get_messages():
+  return jsonify({"messages": message_store}), 200
+
+
+if __name__ == "__main__":
+  app.run(host="0.0.0.0", port=5000, debug=True)
+  ]
     return jsonify({"status": "success", "data": posts})
