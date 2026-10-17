@@ -243,5 +243,20 @@ body {
         <input type="text" id="userQuery" placeholder="यहाँ अपना सवाल लिखें..." style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #1e293b; color: white; outline: none;">
         <button onclick="sendQuery()" style="padding: 10px 15px; background: #0ea5e9; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">भेजें</button>
     </div>
-</div>
+</div>chatForm = document.getElementById('chat-form'); // यदि आपके फॉर्म की आईडी 'chat-form' है
+    const userInput = document.getElementById('user-input'); // जहाँ यूजर टाइप करता है (input/textarea)
+    const chatMessages = document.getElementById('chat-messages'); // जहाँ मैसेज दिखते हैं (container)
+
+    if (chatForm) {
+        chatForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const messageText = userInput.value.trim();
+            if (!messageText) return;
+
+            // 1. यूजर का मैसेज स्क्रीन पर जोड़ें
+            appendMessage(messageText, 'user');
+            userInput.value = '';
+
+            // ऑटो-स्क्रॉल
 </script>
