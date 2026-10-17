@@ -20,3 +20,48 @@ function rotateKey() {
 
 // AI से कुदरत के अजीब
 Next. Js
+fetchNatureNews() {
+    try {
+        console.log("[Nature News] समाचार लोड हो रहा है...");
+        
+        // यदि आप Render/Flask Backend का उपयोग कर रहे हैं:
+        const response = await fetch(NEWS_BACKEND_URL);
+        const data = await response.json();
+        
+        if (data && data.news) {
+            displayNews(data.news);
+        } else {
+            console.warn("[Nature News] डेटा फॉर्मेट सही नहीं है।");
+        }
+    } catch (error) {
+        console.error("[Nature News] फेच करने में त्रुटि:", error);
+        // यदि बैकएंड काम न करे, तो Gemini API से सीधे संपर्क करने का फॉलबैक यहाँ जोड़ सकते हैं
+    }
+}
+fetchNatureNews() {
+    try {
+        console.log("[Nature News] समाचार लोड हो रहा है...");
+        
+        // यदि आप Render/Flask Backend का उपयोग कर रहे हैं:
+        const response = await fetch(NEWS_BACKEND_URL);
+        const data = await response.json();
+        
+        if (data && data.news) {
+            displayNews(data.news);
+        } else {
+            console.warn("[Nature News] डेटा फॉर्मेट सही नहीं है।");
+        }
+    } catch (error) {
+        console.error("[Nature News] फेच करने में त्रुटि:", error);
+        // यदि बैकएंड काम न करे, तो Gemini API से सीधे संपर्क करने का फॉलबैक यहाँ जोड़ सकते हैं
+    }
+}
+
+// 4. समाचार को स्क्रीन पर दिखाने का फंक्शन (UI रेंडरिंग)
+function displayNews(newsList) {
+    const container = document.getElementById("news-container");
+    if (!container
+// 4. समाचार को स्क्रीन पर दिखाने का फंक्शन (UI रेंडरिंग)
+function displayNews(newsList) {
+    const container = document.getElementById("news-container");
+    if (!container
