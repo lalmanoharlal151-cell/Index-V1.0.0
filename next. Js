@@ -65,3 +65,4 @@ function displayNews(newsList) {
 function displayNews(newsList) {
     const container = document.getElementById("news-container");
     if (!container
+<div id="news-container"></div>
