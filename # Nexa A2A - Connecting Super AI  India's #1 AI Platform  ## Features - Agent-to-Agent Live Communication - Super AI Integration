@@ -235,5 +235,13 @@ body {
     
     const aiResponse = await callGeminiAPI("नमस्ते! Nexa A2A सिस्टम शुरू हो चुका है, अपनी स्थिति बताएं।");
     agentOutput.innerHTML = aiResponse;
-  });
+  });id="chat-logs" style="height: 200px; overflow-y: auto; background: #0f172a; padding: 10px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 10px; color: #fff;">
+        <p style="color: #94a3b8; font-size: 14px;">Nexa AI से सवाल पूछें...</p>
+    </div>
+    
+    <div style="display: flex; gap: 8px;">
+        <input type="text" id="userQuery" placeholder="यहाँ अपना सवाल लिखें..." style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #1e293b; color: white; outline: none;">
+        <button onclick="sendQuery()" style="padding: 10px 15px; background: #0ea5e9; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">भेजें</button>
+    </div>
+</div>
 </script>
