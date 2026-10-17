@@ -66,3 +66,16 @@ function displayNews(newsList) {
     const container = document.getElementById("news-container");
     if (!container
 <div id="news-container"></div>
+padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.news-card h3 {
+    margin: 0 0 8px 0;
+    color: #333;
+}
+.news-card p {
+    margin: 0;
+    color: #666;
+}
