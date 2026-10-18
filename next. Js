@@ -1,4 +1,5 @@
 - Nature is Ajeeb-o-Gareeb Samachar (next.js)
+// =========Ajeeb-o-Gareeb Samachar (next.js)
 // ===================================================
 
 // 1. यदि Backend (Flask/Render) से समाचार ला रहे हैं
@@ -14,31 +15,7 @@ const API_KEYS = [
 let currentKeyIndex = 0;
 
 function rotateKey() {
-    currentKeyIndex = (currentKeyIndex + 1) % API_KEYS.length;
-    console.warn(`[Nature News] Switched API Key Index to: ${currentKeyIndex}`);
-}
-
-// AI से कुदरत के अजीब
-Next. Js
-fetchNatureNews() {
-    try {
-        console.log("[Nature News] समाचार लोड हो रहा है...");
-        
-        // यदि आप Render/Flask Backend का उपयोग कर रहे हैं:
-        const response = await fetch(NEWS_BACKEND_URL);
-        const data = await response.json();
-        
-        if (data && data.news) {
-            displayNews(data.news);
-        } else {
-            console.warn("[Nature News] डेटा फॉर्मेट सही नहीं है।");
-        }
-    } catch (error) {
-        console.error("[Nature News] फेच करने में त्रुटि:", error);
-        // यदि बैकएंड काम न करे, तो Gemini API से सीधे संपर्क करने का फॉलबैक यहाँ जोड़ सकते हैं
-    }
-}
-fetchNatureNews() {
+    currentKeyIndex () {
     try {
         console.log("[Nature News] समाचार लोड हो रहा है...");
         
