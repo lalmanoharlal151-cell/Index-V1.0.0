@@ -284,5 +284,11 @@ def get_messages():
 
 if __name__ == "__main__":
   app.run(host="0.0.0.0", port=5000, debug=True)
-  ]
+  ]Project ID
+gen-lang-client-0597808081
+Created
+Oct 18, 2026
+Billing tier
+Free tier
+...dL5g
     return jsonify({"status": "success", "data": posts})
