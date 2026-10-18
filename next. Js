@@ -67,3 +67,14 @@ padding: 15px;
     color: #333;
 }
 <div id="news-container"></div>
+flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)  # यह GitHub Pages को API कॉल करने की अनुमति देगा
+
+@app.route('/api/status', methods=['GET'])
+def get_status():
+    return jsonify({
+        "status": "online",
+        "message": "Nexa AI एजेंट सफलतापूर्वक कनेक्ट हो गया है!"
+    })
