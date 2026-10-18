@@ -77,4 +77,6 @@ def get_status():
     return jsonify({
         "status": "online",
         "message": "Nexa AI एजेंट सफलतापूर्वक कनेक्ट हो गया है!"
-    })
+    })next.js
+git commit -m "Update next.js with clean standard code"
+git push origin
