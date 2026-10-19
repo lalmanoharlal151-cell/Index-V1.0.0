@@ -58,7 +58,7 @@ html>
 <div id="resultBox" style="margin-top: 15px; padding: 10px; background: #111; color: #fff; border-radius: 5px;">
   ⚡ Nexa AI सिस्टम तैयार है।
 </div>
-
+response = await fetch('https://
 <script>
 async function checkServerStatus() {
     const resultBox = document.getElementById('resultBox');
