@@ -292,3 +292,15 @@ Billing tier
 Free tier
 ...dL5g
     return jsonify({"status": "success", "data": posts})
+flask import Flask, jsonify
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)  # यह बहुत ज़रूरी है ताकि GitHub Pages से Render पर रिक्वेस्ट आ सके
+
+@app.route('/api/status', methods=['GET'])
+def system_status():
+    # यहाँ आप चाहें तो अपने सेंसर या सिस्टम की असली जाँच लिख सकते हैं
+    return jsonify({
+        "status": "connected",
+        "message
