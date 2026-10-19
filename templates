@@ -62,5 +62,17 @@ html>
 <script>
 async function checkServerStatus() {
     const resultBox = document.getElementById('resultBox');
+    id="checkBtn" onclick="checkServerStatus()" style="background-color: #0084ff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+  सिस्टम स्थिति जांचें
+</button>
+
+<!-- रिजल्ट दिखाने वाली पट्टी -->
+<div id="resultBox" style="margin-top: 15px; padding: 10px; background: #111; color: #fff; border-radius: 5px;">
+  ⚡ Nexa AI सिस्टम तैयार है।
+</div>
+
+<script>
+async function checkServerStatus() {
+    const resultBox = document.getElementById('resultBox');
     
         .container
