@@ -50,7 +50,10 @@ html>
             background-color: #f4f6f9;
             margin: 0;
             padding: 20px;
-        }id="checkBtn" onclick="checkServerStatus()" style="background-color: #0084ff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+        }id="checkBtn" onclick="checkServerStatus()" style="background-color: #0084ff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointe
+        .container
+  बटन -->
+<button id="checkBtn" onclick="checkServerStatus()" style="background-color: #0084ff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
   सिस्टम स्थिति जांचें
 </button>
 
@@ -58,14 +61,20 @@ html>
 <div id="resultBox" style="margin-top: 15px; padding: 10px; background: #111; color: #fff; border-radius: 5px;">
   ⚡ Nexa AI सिस्टम तैयार है।
 </div>
-response = await fetch('https://
+
 <script>
 async function checkServerStatus() {
     const resultBox = document.getElementById('resultBox');
-    id="checkBtn" onclick="checkServerStatus()" style="background-color: #0084ff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-  सिस्टम स्थिति जांचें
-</button>
-
-response = await fetch('https://
     
-        .container
+    // 1. जाँच शुरू होने पर यह दिखेगा
+    resultBox.innerHTML = "🔄 सिस्टम की जाँच हो रही है (Checking)...";
+    resultBox.style.color = "#ffa500"; // पीला रंग
+    
+    try {
+        // अपने Render ऐप का असली URL यहाँ डालें (जैसे: https://your-app-name.onrender.com/api/status)
+        let response = await fetch('https://YOUR-RENDER-APP-URL.onrender.com/api/status');
+        let data = await response.json();
+        
+        // 2. सर्वर से जवाब मिलने पर
+        if (data.status === "connected") {
+            resultBox.innerHTML
