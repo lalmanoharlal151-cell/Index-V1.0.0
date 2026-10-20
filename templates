@@ -5,6 +5,17 @@ DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>दुकान साथी AI</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            paddingDOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>दुकान साथी AI</title>
+    <style>
         body { 
             font-family: Arial, sans-serif; 
             background-color: #f4f6f9;
