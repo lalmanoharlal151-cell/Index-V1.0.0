@@ -1,1 +1,16 @@
+fastapi import FastAPI, BackgroundTasks
+from pydantic import BaseModel
+import time
 
+app = FastAPI(title="All in One App", version="1.0")
+
+class UserQuery(id: str, query_text: str):
+    pass
+
+@app.get("/")
+def home():
+    return {"message": "All in One App is running successfully on Render!"}
+
+# फोन या चैट से आने वाले सवाल को प्रोसेस करने का एंडपॉइंट
+@app.post("/process-query/")
+async def process_user_query
