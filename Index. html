@@ -1,4 +1,1940 @@
-lang="hi">
+lang="hi">```html
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>दुकान साथी AI - बिलिंग व रिपोर्ट</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Hind & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Hind', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        navy: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        },
+                        emerald: {
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Hind', 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Print CSS Rules for Thermal Receipt & A4 */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printableReceipt, #printableReceipt * {
+                visibility: visible;
+            }
+            #printableReceipt {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                max-width: 80mm; /* Thermal printer default */
+                padding: 10px;
+                font-size: 12px;
+                color: #000;
+                background: #fff;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-emerald-500 selection:text-white">
+
+    <!-- Top Header Navigation -->
+    <header class="bg-navy-800 text-white sticky top-0 z-30 shadow-md no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="bg-emerald-500 p-2 rounded-lg text-white">
+                    <i class="fa-solid font-bold text-xl fa-store"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight sm:text-xl">दुकान साथी AI</h1>
+                    <p class="text-xs text-slate-300">स्मार्ट बिलिंग व व्यवसाय रिपोर्ट</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 space-x-reverse">
+                <button onclick="openApiKeyModal()" class="px-3 py-1.5 text-xs sm:text-sm bg-slate-700 hover:bg-slate-600 text-slate-100 rounded-lg transition-colors flex items-center gap-1.5 border border-slate-600">
+                    <i class="fa-solid fa-key text-amber-400"></i>
+                    <span class="hidden sm:inline">Gemini API कुंजी</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex-grow no-print">
+        
+        <!-- Tab Navigation Buttons -->
+        <div class="flex border-b border-slate-200 mb-6 bg-white p-1.5 rounded-xl shadow-sm overflow-x-auto">
+            <button id="tabBtnBilling" onclick="switchTab('billing')" class="flex-1 py-2.5 px-4 text-center font-semibold text-sm sm:text-base rounded-lg transition-all flex items-center justify-center gap-2 bg-navy-800 text-white shadow">
+                <i class="fa-solid fa-file-invoice"></i>
+                <span>नया बिल (Billing)</span>
+            </button>
+            <button id="tabBtnReports" onclick="switchTab('reports')" class="flex-1 py-2.5 px-4 text-center font-semibold text-sm sm:text-base text-slate-600 hover:text-navy-800 rounded-lg transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>बिक्री रिपोर्ट (Reports)</span>
+            </button>
+            <button id="tabBtnAi" onclick="switchTab('ai')" class="flex-1 py-2.5 px-4 text-center font-semibold text-sm sm:text-base text-slate-600 hover:text-navy-800 rounded-lg transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-robot text-emerald-600"></i>
+                <span>AI सहायक (Assistant)</span>
+            </button>
+        </div>
+
+        <!-- Notification Banner -->
+        <div id="toast" class="hidden mb-4 p-4 rounded-xl text-sm font-medium transition-all duration-300 shadow-sm flex items-center justify-between">
+            <span id="toastMessage"></span>
+            <button onclick="hideToast()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <!-- TAB 1: BILLING SECTION -->
+        <section id="tabBilling" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left Column: Item Entry Form -->
+            <div class="lg:col-span-5 bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80">
+                <h2 class="text-lg font-bold text-navy-800 border-b pb-3 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-cart-plus text-emerald-600"></i>
+                    सामग्री जोड़ें (Add Item)
+                </h2>
+
+                <form id="itemForm" onsubmit="addItemToBill(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">सामग्री का नाम (Item Name) *</label>
+                        <input type="text" id="itemName" required placeholder="जैसे: चीनी, आटा, फॉर्च्यून तेल..." class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm outline-none transition">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">मात्रा (Quantity) *</label>
+                            <input type="number" step="0.01" min="0.01" id="itemQty" required placeholder="1" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">इकाई (Unit)</label>
+                            <select id="itemUnit" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm outline-none transition bg-white">
+                                <option value="किग्रा (kg)">किग्रा (kg)</option>
+                                <option value="लीटर (litre)">लीटर (litre)</option>
+                                <option value="पीस (piece)">पीस (piece)</option>
+                                <option value="पैकेट (packet)">पैकेट (packet)</option>
+                                <option value="ग्राम (gm)">ग्राम (gm)</option>
+                                <option value="मीटर (m)">मीटर (m)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">प्रति इकाई दर (Price ₹) *</label>
+                            <input type="number" step="0.01" min="0" id="itemPrice" required placeholder="0.00" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">छूट (Discount %)</label>
+                            <input type="number" step="0.1" min="0" max="100" id="itemDiscount" placeholder="0" value="0" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm outline-none transition">
+                        </div>
+                    </div>
+
+                    <div class="pt-2 flex gap-3">
+                        <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm shadow">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>आइटम जोड़ें</span>
+                        </button>
+                        <button type="button" onclick="resetItemForm()" class="px-4 py-2.5 border border-slate-300 text-slate-600 hover:bg-slate-50 font-semibold rounded-lg text-sm transition">
+                            साफ़ करें
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Right Column: Current Bill Table & Total -->
+            <div class="lg:col-span-7 bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b pb-3 mb-4">
+                        <h2 class="text-lg font-bold text-navy-800 flex items-center gap-2">
+                            <i class="fa-solid fa-receipt text-navy-800"></i>
+                            वर्तमान बिल (Current Receipt)
+                        </h2>
+                        <span id="currentBillNo" class="text-xs bg-slate-100 text-slate-700 font-semibold px-2.5 py-1 rounded-full border">
+                            बिल # --
+                        </span>
+                    </div>
+
+                    <!-- Items Table -->
+                    <div class="overflow-x-auto max-h-72 mb-4 border rounded-xl">
+                        <table class="w-full text-left text-xs sm:text-sm">
+                            <thead class="bg-slate-50 text-slate-600 font-semibold border-b">
+                                <tr>
+                                    <th class="p-2.5">सामग्री</th>
+                                    <th class="p-2.5 text-center">मात्रा</th>
+                                    <th class="p-2.5 text-right">दर</th>
+                                    <th class="p-2.5 text-right">छूट</th>
+                                    <th class="p-2.5 text-right">कुल ₹</th>
+                                    <th class="p-2.5 text-center">हटाएं</th>
+                                </tr>
+                            </thead>
+                            <tbody id="billItemsTable" class="divide-y divide-slate-100">
+                                <tr>
+                                    <td colspan="6" class="p-6 text-center text-slate-400 italic">
+                                        अभी कोई आइटम नहीं जोड़ा गया है।
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Totals & Actions -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-3">
+                    <div class="flex justify-between text-xs sm:text-sm text-slate-600">
+                        <span>कुल मूल्य (Subtotal):</span>
+                        <span id="subTotalDisplay" class="font-semibold text-slate-800">₹0.00</span>
+                    </div>
+                    <div class="flex justify-between text-xs sm:text-sm text-emerald-600">
+                        <span>कुल छूट (Total Discount):</span>
+                        <span id="discountDisplay" class="font-semibold">- ₹0.00</span>
+                    </div>
+                    <div class="flex justify-between text-base sm:text-lg font-bold text-navy-800 border-t border-slate-200 pt-2">
+                        <span>देय राशि (Final Amount):</span>
+                        <span id="finalTotalDisplay" class="text-emerald-600">₹0.00</span>
+                    </div>
+
+                    <div class="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button onclick="printBill()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm shadow">
+                            <i class="fa-solid fa-print"></i>
+                            <span>प्रिंट / PDF डाउनलोड</span>
+                        </button>
+                        <button onclick="saveAndNewBill()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm shadow">
+                            <i class="fa-solid fa-check"></i>
+                            <span>सहेजें और नया बिल बनाएं</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: REPORTS & SALES HISTORY -->
+        <section id="tabReports" class="hidden space-y-6">
+            <!-- KPI Overview Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">आज की कुल बिक्री</p>
+                        <h3 id="kpiTodaySales" class="text-2xl font-extrabold text-emerald-600 mt-1">₹0.00</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 text-xl">
+                        <i class="fa-solid fa-indian-rupee-sign"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">कुल बिल संख्या</p>
+                        <h3 id="kpiTotalBills" class="text-2xl font-extrabold text-navy-800 mt-1">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-navy-800 text-xl">
+                        <i class="fa-solid fa-file-invoice"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">औसत बिल मूल्य</p>
+                        <h3 id="kpiAvgBill" class="text-2xl font-extrabold text-blue-600 mt-1">₹0.00</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 text-xl">
+                        <i class="fa-solid fa-calculator"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales History Table -->
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b pb-4 mb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-navy-800">बिक्री इतिहास (Saved Bills History)</h2>
+                        <p class="text-xs text-slate-500">आपके सहेजे गए सभी बिलों की सूची</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="exportCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-3.5 rounded-lg text-xs sm:text-sm transition flex items-center gap-1.5 shadow">
+                            <i class="fa-solid fa-file-excel"></i>
+                            <span>एक्सेल/CSV डाउनलोड करें</span>
+                        </button>
+                        <button onclick="clearHistory()" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-semibold py-2 px-3 rounded-lg text-xs sm:text-sm transition">
+                            इतिहास साफ़ करें
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border rounded-xl">
+                    <table class="w-full text-left text-xs sm:text-sm">
+                        <thead class="bg-slate-50 text-slate-600 font-semibold border-b">
+                            <tr>
+                                <th class="p-3">बिल आईडी</th>
+                                <th class="p-3">दिनांक व समय</th>
+                                <th class="p-3">कुल आइटम</th>
+                                <th class="p-3 text-right">कुल छूट</th>
+                                <th class="p-3 text-right">कुल राशि ₹</th>
+                                <th class="p-3 text-center">कार्रवाई</th>
+                            </tr>
+                        </thead>
+                        <tbody id="salesHistoryTable" class="divide-y divide-slate-100">
+                            <tr>
+                                <td colspan="6" class="p-6 text-center text-slate-400 italic">
+                                    कोई पुराना बिल इतिहास उपलब्ध नहीं है।
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: GEMINI AI ASSISTANT -->
+        <section id="tabAi" class="hidden space-y-6">
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80">
+                <div class="flex items-center justify-between border-b pb-4 mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-navy-800">दुकान साथी AI सलाह</h2>
+                            <p class="text-xs text-slate-500">Gemini AI संचालित व्यापार सहायक</p>
+                        </div>
+                    </div>
+                    <span id="aiApiKeyStatus" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border">
+                        स्मार्ट नियम मोड (निशुल्क)
+                    </span>
+                </div>
+
+                <!-- Pre-built AI Action Triggers -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+                    <button onclick="askAiPrompt('sales_analysis')" class="p-3 text-left border rounded-xl hover:border-emerald-500 hover:bg-emerald-50/40 transition group">
+                        <div class="flex items-center gap-2 font-semibold text-sm text-navy-800 group-hover:text-emerald-700">
+                            <i class="fa-solid fa-chart-pie text-emerald-600"></i>
+                            <span>बिक्री का विश्लेषण करें</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">हाल ही की बिक्री डेटा से लाभ और ट्रेंड समझें</p>
+                    </button>
+
+                    <button onclick="askAiPrompt('profit_tips')" class="p-3 text-left border rounded-xl hover:border-emerald-500 hover:bg-emerald-50/40 transition group">
+                        <div class="flex items-center gap-2 font-semibold text-sm text-navy-800 group-hover:text-emerald-700">
+                            <i class="fa-solid fa-lightbulb text-amber-500"></i>
+                            <span>मुनाफा बढ़ाने के सुझाव</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">दुकान की बिक्री व मार्जिन बढ़ाने के उपाय</p>
+                    </button>
+
+                    <button onclick="askAiPrompt('stock_advice')" class="p-3 text-left border rounded-xl hover:border-emerald-500 hover:bg-emerald-50/40 transition group">
+                        <div class="flex items-center gap-2 font-semibold text-sm text-navy-800 group-hover:text-emerald-700">
+                            <i class="fa-solid fa-boxes-packing text-blue-600"></i>
+                            <span>स्टॉक सलाह</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">कौन सा सामान अधिक बिक रहा है?</p>
+                    </button>
+                </div>
+
+                <!-- Chat Messages Display -->
+                <div id="aiChatBox" class="h-80 overflow-y-auto border rounded-xl p-4 bg-slate-50 space-y-3 mb-4">
+                    <div class="bg-white p-3.5 rounded-xl border border-slate-200 max-w-2xl shadow-2xs">
+                        <p class="text-xs font-bold text-emerald-700 mb-1">दुकान साथी AI:</p>
+                        <p class="text-xs sm:text-sm text-slate-700">
+                            नमस्कार! मैं आपका AI दुकान सहायक हूँ। आप अपनी दुकान की बिक्री, स्टॉक, या मुनाफा बढ़ाने के बारे में कोई भी प्रश्न हिंदी में पूछ सकते हैं।
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Input Box with Voice & Send -->
+                <div class="flex items-center gap-2">
+                    <input type="text" id="aiUserInput" placeholder="यहाँ प्रश्न लिखें (जैसे: चीनी की बिक्री कैसे बढ़ाएं?)..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-xs sm:text-sm outline-none">
+                    <button onclick="toggleVoiceInput()" id="voiceBtn" title="आवाज़ से बोलें" class="p-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl transition">
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+                    <button onclick="sendAiMessage()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5 shadow">
+                        <span>पूछें</span>
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Printable Receipt Template Hidden in Layout -->
+    <div id="printableReceipt" class="hidden">
+        <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
+            <h2 style="font-size: 16px; font-weight: bold; margin: 0;">दुकान साथी स्टोर</h2>
+            <p style="margin: 2px 0 0 0; font-size: 10px;">ग्राहक रसीद / Cash Receipt</p>
+            <p id="printBillMeta" style="margin: 2px 0 0 0; font-size: 10px;"></p>
+        </div>
+
+        <table style="width: 100%; text-align: left; border-collapse: collapse; font-size: 11px;">
+            <thead>
+                <tr style="border-bottom: 1px solid #000;">
+                    <th style="padding: 2px 0;">सामग्री</th>
+                    <th style="padding: 2px 0; text-align: center;">मात्रा</th>
+                    <th style="padding: 2px 0; text-align: right;">दर</th>
+                    <th style="padding: 2px 0; text-align: right;">कुल</th>
+                </tr>
+            </thead>
+            <tbody id="printItemsList"></tbody>
+        </table>
+
+        <div style="border-top: 1px dashed #000; margin-top: 8px; padding-top: 6px; font-size: 11px;">
+            <div style="display: flex; justify-content: space-between;">
+                <span>कुल (Subtotal):</span>
+                <span id="printSubtotal">₹0.00</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span>छूट (Discount):</span>
+                <span id="printDiscount">- ₹0.00</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 13px; margin-top: 4px; border-top: 1px solid #000; padding-top: 4px;">
+                <span>कुल देय (Final Amount):</span>
+                <span id="printFinalTotal">₹0.00</span>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 12px; font-size: 10px;">
+            <p style="margin:0;">धन्यवाद! फिर पधारें।</p>
+        </div>
+    </div>
+
+    <!-- API Key Settings Modal -->
+    <div id="apiKeyModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-navy-800 text-lg">Gemini API कुंजी दर्ज करें</h3>
+                <button onclick="closeApiKeyModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-xs text-slate-600 mb-4 leading-relaxed">
+                वास्तविक Gemini AI उत्तर प्राप्त करने के लिए अपनी API Key दर्ज करें। यदि Key नहीं है, तो ऐप स्मार्ट इन-बिल्ट एनालाइज़र का उपयोग करेगा।
+            </p>
+            <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 text-sm outline-none mb-4">
+            <div class="flex justify-end gap-2">
+                <button onclick="closeApiKeyModal()" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-sm">रद्द करें</button>
+                <button onclick="saveApiKey()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold">सहेजें</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application JavaScript Logic -->
+    <script>
+        // Data State Management
+        let currentBill = {
+            id: generateBillId(),
+            timestamp: new Date().toISOString(),
+            items: [],
+            subtotal: 0,
+            discount: 0,
+            finalTotal: 0
+        };
+
+        let salesHistory = [];
+        let geminiApiKey = localStorage.getItem('dukansaathi_gemini_key') || '';
+
+        // Initial Load Event
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSalesHistory();
+            updateBillDisplay();
+            updateKPIs();
+            checkApiKeyStatus();
+
+            // Handle ENTER key in AI chat
+            document.getElementById('aiUserInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendAiMessage();
+            });
+        });
+
+        // Helper: Bill ID Generator
+        function generateBillId() {
+            return 'DS-' + Math.floor(100000 + Math.random() * 900000);
+        }
+
+        // Tab Switching Logic
+        function switchTab(tab) {
+            const tabs = ['billing', 'reports', 'ai'];
+            tabs.forEach(t => {
+                const sec = document.getElementById('tab' + capitalize(t));
+                const btn = document.getElementById('tabBtn' + capitalize(t));
+                if (t === tab) {
+                    sec.classList.remove('hidden');
+                    btn.className = 'flex-1 py-2.5 px-4 text-center font-semibold text-sm sm:text-base rounded-lg transition-all flex items-center justify-center gap-2 bg-navy-800 text-white shadow';
+                } else {
+                    sec.classList.add('hidden');
+                    btn.className = 'flex-1 py-2.5 px-4 text-center font-semibold text-sm sm:text-base text-slate-600 hover:text-navy-800 rounded-lg transition-all flex items-center justify-center gap-2';
+                }
+            });
+            if (tab === 'reports') renderSalesHistoryTable();
+        }
+
+        function capitalize(s) {
+            return s.charAt(0).toUpperCase() + s.slice(1);
+        }
+
+        // Add Item to Current Bill
+        function addItemToBill(event) {
+            event.preventDefault();
+            const name = document.getElementById('itemName').value.trim();
+            const qty = parseFloat(document.getElementById('itemQty').value);
+            const unit = document.getElementById('itemUnit').value;
+            const price = parseFloat(document.getElementById('itemPrice').value);
+            const discountPct = parseFloat(document.getElementById('itemDiscount').value) || 0;
+
+            if (!name || isNaN(qty) || isNaN(price)) {
+                showToast('कृपया सभी आवश्यक विवरण सही से भरें।', 'bg-red-100 text-red-800');
+                return;
+            }
+
+            const itemSubtotal = qty * price;
+            const itemDiscount = (itemSubtotal * discountPct) / 100;
+            const itemFinal = itemSubtotal - itemDiscount;
+
+            const newItem = {
+                id: Date.now(),
+                name,
+                qty,
+                unit,
+                price,
+                discountPct,
+                discountAmt: itemDiscount,
+                finalAmt: itemFinal
+            };
+
+            currentBill.items.push(newItem);
+            recalculateTotals();
+            updateBillDisplay();
+            resetItemForm();
+            showToast('सामग्री सफलता से जोड़ी गई!', 'bg-emerald-100 text-emerald-800');
+        }
+
+        // Recalculate Bill Totals
+        function recalculateTotals() {
+            currentBill.subtotal = currentBill.items.reduce((sum, item) => sum + (item.qty * item.price), 0);
+            currentBill.discount = currentBill.items.reduce((sum, item) => sum + item.discountAmt, 0);
+            currentBill.finalTotal = currentBill.subtotal - currentBill.discount;
+        }
+
+        // Update Bill Render UI
+        function updateBillDisplay() {
+            document.getElementById('currentBillNo').innerText = 'बिल #' + currentBill.id;
+            const tableBody = document.getElementById('billItemsTable');
+
+            if (currentBill.items.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="p-6 text-center text-slate-400 italic">
+                            अभी कोई आइटम नहीं जोड़ा गया है।
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tableBody.innerHTML = currentBill.items.map((item, index) => `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-2.5 font-medium text-slate-800">${escapeHtml(item.name)}</td>
+                        <td class="p-2.5 text-center">${item.qty} ${item.unit}</td>
+                        <td class="p-2.5 text-right">₹${item.price.toFixed(2)}</td>
+                        <td class="p-2.5 text-right text-emerald-600">₹${item.discountAmt.toFixed(2)}</td>
+                        <td class="p-2.5 text-right font-semibold">₹${item.finalAmt.toFixed(2)}</td>
+                        <td class="p-2.5 text-center">
+                            <button onclick="removeItemFromBill(${index})" class="text-red-500 hover:text-red-700 p-1">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            document.getElementById('subTotalDisplay').innerText = '₹' + currentBill.subtotal.toFixed(2);
+            document.getElementById('discountDisplay').innerText = '- ₹' + currentBill.discount.toFixed(2);
+            document.getElementById('finalTotalDisplay').innerText = '₹' + currentBill.finalTotal.toFixed(2);
+        }
+
+        function removeItemFromBill(index) {
+            currentBill.items.splice(index, 1);
+            recalculateTotals();
+            updateBillDisplay();
+            showToast('सामग्री हटाई गई।', 'bg-slate-100 text-slate-800');
+        }
+
+        function resetItemForm() {
+            document.getElementById('itemForm').reset();
+            document.getElementById('itemDiscount').value = "0";
+            document.getElementById('itemName').focus();
+        }
+
+        // Save Current Bill & Start New
+        function saveAndNewBill() {
+            if (currentBill.items.length === 0) {
+                showToast('बिल खाली है! पहले आइटम जोड़ें।', 'bg-amber-100 text-amber-800');
+                return;
+            }
+
+            salesHistory.push({ ...currentBill });
+            saveSalesHistory();
+            updateKPIs();
+
+            // Reset Current Bill State
+            currentBill = {
+                id: generateBillId(),
+                timestamp: new Date().toISOString(),
+                items: [],
+                subtotal: 0,
+                discount: 0,
+                finalTotal: 0
+            };
+
+            updateBillDisplay();
+            showToast('बिल सहेजा गया और नया बिल तैयार है!', 'bg-emerald-100 text-emerald-800');
+        }
+
+        // Print Bill Function
+        function printBill() {
+            if (currentBill.items.length === 0) {
+                showToast('प्रिंट करने के लिए कोई आइटम नहीं है।', 'bg-amber-100 text-amber-800');
+                return;
+            }
+
+            const printMeta = document.getElementById('printBillMeta');
+            printMeta.innerText = `बिल नं: ${currentBill.id} | दिनांक: ${new Date().toLocaleDateString('hi-IN')}`;
+
+            const printItems = document.getElementById('printItemsList');
+            printItems.innerHTML = currentBill.items.map(item => `
+                <tr style="border-bottom: 1px border #eee;">
+                    <td style="padding: 3px 0;">${escapeHtml(item.name)}</td>
+                    <td style="padding: 3px 0; text-align: center;">${item.qty} ${item.unit}</td>
+                    <td style="padding: 3px 0; text-align: right;">₹${item.price.toFixed(2)}</td>
+                    <td style="padding: 3px 0; text-align: right;">₹${item.finalAmt.toFixed(2)}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('printSubtotal').innerText = '₹' + currentBill.subtotal.toFixed(2);
+            document.getElementById('printDiscount').innerText = '- ₹' + currentBill.discount.toFixed(2);
+            document.getElementById('printFinalTotal').innerText = '₹' + currentBill.finalTotal.toFixed(2);
+
+            const receiptElem = document.getElementById('printableReceipt');
+            receiptElem.classList.remove('hidden');
+            window.print();
+            receiptElem.classList.add('hidden');
+        }
+
+        // Local Storage & Reports Management
+        function saveSalesHistory() {
+            localStorage.setItem('dukansaathi_sales_history', JSON.stringify(salesHistory));
+        }
+
+        function loadSalesHistory() {
+            const saved = localStorage.getItem('dukansaathi_sales_history');
+            if (saved) {
+                try {
+                    salesHistory = JSON.parse(saved);
+                } catch(e) {
+                    salesHistory = [];
+                }
+            }
+        }
+
+        function updateKPIs() {
+            const todayStr = new Date().toDateString();
+            const todayBills = salesHistory.filter(b => new Date(b.timestamp).toDateString() === todayStr);
+
+            const todayTotal = todayBills.reduce((sum, b) => sum + b.finalTotal, 0);
+            const totalBillsCount = salesHistory.length;
+            const overallTotal = salesHistory.reduce((sum, b) => sum + b.finalTotal, 0);
+            const avgBillVal = totalBillsCount > 0 ? (overallTotal / totalBillsCount) : 0;
+
+            document.getElementById('kpiTodaySales').innerText = '₹' + todayTotal.toFixed(2);
+            document.getElementById('kpiTotalBills').innerText = totalBillsCount;
+            document.getElementById('kpiAvgBill').innerText = '₹' + avgBillVal.toFixed(2);
+        }
+
+        function renderSalesHistoryTable() {
+            const tbody = document.getElementById('salesHistoryTable');
+            if (salesHistory.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="p-6 text-center text-slate-400 italic">
+                            कोई पुराना बिल इतिहास उपलब्ध नहीं है।
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = [...salesHistory].reverse().map(bill => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3 font-semibold text-slate-800">${bill.id}</td>
+                    <td class="p-3 text-slate-600">${new Date(bill.timestamp).toLocaleString('hi-IN')}</td>
+                    <td class="p-3">${bill.items.length} आइटम</td>
+                    <td class="p-3 text-right text-emerald-600">₹${bill.discount.toFixed(2)}</td>
+                    <td class="p-3 text-right font-bold text-slate-900">₹${bill.finalTotal.toFixed(2)}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="reprintBill('${bill.id}')" class="text-slate-600 hover:text-navy-800 p-1" title="देखें/प्रिंट">
+                            <i class="fa-solid fa-print"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function reprintBill(billId) {
+            const found = salesHistory.find(b => b.id === billId);
+            if (!found) return;
+
+            currentBill = { ...found };
+            recalculateTotals();
+            updateBillDisplay();
+            switchTab('billing');
+            showToast(`बिल #${billId} लोड हो गया है।`, 'bg-blue-100 text-blue-800');
+        }
+
+        function clearHistory() {
+            if (salesHistory.length === 0) return;
+            salesHistory = [];
+            saveSalesHistory();
+            updateKPIs();
+            renderSalesHistoryTable();
+            showToast('बिक्री इतिहास सफलतापूर्वक साफ़ किया गया।', 'bg-slate-100 text-slate-800');
+        }
+
+        // Export Sales Report to CSV
+        function exportCSV() {
+            if (salesHistory.length === 0) {
+                showToast('निर्यात (Export) करने के लिए कोई बिक्री डेटा नहीं है।', 'bg-amber-100 text-amber-800');
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,Bill ID,Date Time,Item Count,Subtotal,Discount,Final Total\n";
+
+            salesHistory.forEach(b => {
+                const dt = new Date(b.timestamp).toLocaleString().replace(/,/g, '');
+                csvContent += `${b.id},${dt},${b.items.length},${b.subtotal},${b.discount},${b.finalTotal}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Dukaan_Saathi_Sales_Report_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Gemini AI Integration Section
+        function checkApiKeyStatus() {
+            const statusElem = document.getElementById('aiApiKeyStatus');
+            if (geminiApiKey) {
+                statusElem.innerText = 'Gemini AI एक्टिवेटर सक्षम';
+                statusElem.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200';
+            } else {
+                statusElem.innerText = 'स्मार्ट नियम मोड (निशुल्क)';
+                statusElem.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border';
+            }
+        }
+
+        function openApiKeyModal() {
+            document.getElementById('apiKeyInput').value = geminiApiKey;
+            document.getElementById('apiKeyModal').classList.remove('hidden');
+        }
+
+        function closeApiKeyModal() {
+            document.getElementById('apiKeyModal').classList.add('hidden');
+        }
+
+        function saveApiKey() {
+            geminiApiKey = document.getElementById('apiKeyInput').value.trim();
+            localStorage.setItem('dukansaathi_gemini_key', geminiApiKey);
+            checkApiKeyStatus();
+            closeApiKeyModal();
+            showToast('Gemini API कुंजी सफलतापूर्वक सहेजी गई!', 'bg-emerald-100 text-emerald-800');
+        }
+
+        function askAiPrompt(type) {
+            let promptText = "";
+            if (type === 'sales_analysis') {
+                promptText = "मेरी हालिया बिक्री और बिलिंग पैटर्न का विश्लेषण करें और मुख्य अंतर्दृष्टि (insights) बताएं।";
+            } else if (type === 'profit_tips') {
+                promptText = "मेरी किराना/रिटेल दुकान के लिए मुनाफा और ग्राहक संतुष्टि बढ़ाने के 4 बेहतरीन सुझाव दें।";
+            } else if (type === 'stock_advice') {
+                promptText = "मुझे स्टॉक प्रबंधन और तेजी से बिकने वाले सामानों को प्रबंधित करने की सलाह दें।";
+            }
+
+            document.getElementById('aiUserInput').value = promptText;
+            sendAiMessage();
+        }
+
+        async function sendAiMessage() {
+            const inputElem = document.getElementById('aiUserInput');
+            const userQuery = inputElem.value.trim();
+            if (!userQuery) return;
+
+            appendChatMessage('आप', userQuery, 'user');
+            inputElem.value = '';
+
+            const loadingId = appendChatMessage('दुकान साथी AI', 'विचार कर रहा है...', 'ai', true);
+
+            // Fetch live context stats
+            const totalSalesAmt = salesHistory.reduce((s, b) => s + b.finalTotal, 0);
+            const totalBillsCount = salesHistory.length;
+
+            if (geminiApiKey) {
+                // Call Google Gemini API
+                try {
+                    const systemPrompt = `आप "दुकान साथी AI" हैं - एक विशेषज्ञ भारतीय रिटेल व्यवसाय सलाहकार। उपयोगकर्ता की दुकान का विवरण: कुल बिल=${totalBillsCount}, कुल बिक्री=₹${totalSalesAmt}। सभी उत्तर हमेशा स्पष्ट, व्यावहारिक और हिंदी भाषा में दें। संक्षिप्त व बिंदुओं में उत्तर दें।`;
+                    
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${geminiApiKey}`;
+                    
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: userQuery }] }],
+                            systemInstruction: { parts: [{ text: systemPrompt }] }
+                        })
+                    });
+
+                    const data = await response.json();
+                    removeChatMessage(loadingId);
+
+                    if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+                        appendChatMessage('दुकान साथी AI', data.candidates[0].content.parts[0].text, 'ai');
+                    } else {
+                        appendChatMessage('दुकान साथी AI', 'क्षमा करें, AI उत्तर प्राप्त करने में समस्या हुई। कृपया अपनी API कुंजी जांचें।', 'ai');
+                    }
+                } catch(err) {
+                    removeChatMessage(loadingId);
+                    appendChatMessage('दुकान साथी AI', 'नेटवर्क या API में त्रुटि हुई। स्मार्ट नियम-आधारित सलाह पर स्विच किया जा रहा है।', 'ai');
+                    fallbackAiResponse(userQuery);
+                }
+            } else {
+                // Smart Rule-based Fallback AI Engine
+                setTimeout(() => {
+                    removeChatMessage(loadingId);
+                    fallbackAiResponse(userQuery);
+                }, 600);
+            }
+        }
+
+        function fallbackAiResponse(query) {
+            const q = query.toLowerCase();
+            let response = "";
+
+            const totalSales = salesHistory.reduce((s, b) => s + b.finalTotal, 0);
+            const billCount = salesHistory.length;
+
+            if (q.includes('बिक्री') || q.includes('विश्लेषण') || q.includes('sales')) {
+                response = `📊 **बिक्री विश्लेषण रिपोर्ट:**\n- आपने कुल **${billCount} बिल** बनाए हैं।\n- आपकी कुल दर्ज बिक्री **₹${totalSales.toFixed(2)}** है।\n- सलाह: व्यस्त समय में लोकप्रिय सामान (जैसे दूध, चीनी, आटा) काउंटर के पास रखें।`;
+            } else if (q.includes('मुनाफा') || q.includes('लाभ') || q.includes('profit')) {
+                response = `💡 **मुनाफा बढ़ाने के मुख्य सुझाव:**\n1. **कॉम्बो ऑफर दें:** जैसे 5 किग्रा आटा के साथ 10% छूट वाला तेल पैकेज।\n2. **धीमे बिकने वाले सामान:** जिन सामानों की बिक्री कम है, उनपर छोटा डिस्काउंट देकर पुराना स्टॉक खाली करें।\n3. **डिजिटल पेमेंट बहीखाता:** ग्राहकों को डिजिटल रसीद और त्वरित सेवा दें।`;
+            } else if (q.includes('स्टॉक') || q.includes('सामान') || q.includes('stock')) {
+                response = `📦 **स्मार्ट स्टॉक सलाह:**\n- दैनिक खपत वाले राशन का स्टॉक हफ्ते में कम से कम 2 बार री-स्टॉक करें।\n- एक्सपायरी डेट वाले प्रॉडक्ट्स पर FIFO (First-In, First-Out) नियम लागू करें।`;
+            } else {
+                response = `धन्यवाद! आपकी दुकान में अभी **${billCount} बिलों** के साथ **₹${totalSales.toFixed(2)}** की कुल बिक्री दर्ज है। अपनी बिक्री बढ़ाने के लिए नियमित रूप से डिस्काउंट ऑफर्स और तेज बिलिंग सेवा का उपयोग करें।`;
+            }
+
+            appendChatMessage('दुकान साथी AI', response, 'ai');
+        }
+
+        function appendChatMessage(sender, text, type, isLoading = false) {
+            const chatBox = document.getElementById('aiChatBox');
+            const msgId = 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4);
+
+            const isUser = type === 'user';
+            const html = `
+                <div id="${msgId}" class="flex ${isUser ? 'justify-end' : 'justify-start'}">
+                    <div class="${isUser ? 'bg-navy-800 text-white' : 'bg-white border border-slate-200 text-slate-800'} p-3.5 rounded-xl max-w-xl text-xs sm:text-sm shadow-2xs">
+                        <p class="font-bold text-xs ${isUser ? 'text-emerald-300' : 'text-emerald-700'} mb-1">${sender}:</p>
+                        <div class="whitespace-pre-line leading-relaxed">${escapeHtml(text)}</div>
+                    </div>
+                </div>
+            `;
+
+            chatBox.insertAdjacentHTML('beforeend', html);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            return msgId;
+        }
+
+        function removeChatMessage(id) {
+            const elem = document.getElementById(id);
+            if (elem) elem.remove();
+        }
+
+        // Voice Input Functionality
+        function toggleVoiceInput() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                showToast('आपके ब्राउज़र में आवाज़ पहचान (Voice Input) समर्थित नहीं है।', 'bg-amber-100 text-amber-800');
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'hi-IN';
+
+            const voiceBtn = document.getElementById('voiceBtn');
+            voiceBtn.classList.add('animate-pulse', 'bg-red-500', 'text-white');
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('aiUserInput').value = transcript;
+                voiceBtn.classList.remove('animate-pulse', 'bg-red-500', 'text-white');
+                sendAiMessage();
+            };
+
+            recognition.onerror = () => {
+                voiceBtn.classList.remove('animate-pulse', 'bg-red-500', 'text-white');
+                showToast('आवाज़ सुनने में असमर्थ, कृपया पुनः प्रयास करें।', 'bg-red-100 text-red-800');
+            };
+
+            recognition.onend = () => {
+                voiceBtn.classList.remove('animate-pulse', 'bg-red-500', 'text-white');
+            };
+
+            recognition.start();
+        }
+
+        // UI Toast Message Utility
+        function showToast(msg, bgClasses = 'bg-slate-800 text-white') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMessage');
+            toast.className = `mb-4 p-3.5 rounded-xl text-xs sm:text-sm font-medium transition-all shadow-sm flex items-center justify-between ${bgClasses}`;
+            toastMsg.innerText = msg;
+            toast.classList.remove('hidden');
+
+            setTimeout(() => {
+                hideToast();
+            }, 3500);
+        }
+
+        function hideToast() {
+            document.getElementById('toast').classList.add('hidden');
+        }
+
+        // Safety HTML Escaper
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
+``````html
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>दुकान साथी AI - बिलिंग व रिपोर्ट</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Hind & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Hind', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        navy: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        },
+                        emerald: {
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Hind', 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Print CSS Rules for Thermal Receipt & A4 */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printableReceipt, #printableReceipt * {
+                visibility: visible;
+            }
+            #printableReceipt {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                max-width: 80mm; /* Thermal printer default */
+                padding: 10px;
+                font-size: 12px;
+                color: #000;
+                background: #fff;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-emerald-500 selection:text-white">
+
+    <!-- Top Header Navigation -->
+    <header class="bg-navy-800 text-white sticky top-0 z-30 shadow-md no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="bg-emerald-500 p-2 rounded-lg text-white">
+                    <i class="fa-solid font-bold text-xl fa-store"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight sm:text-xl">दुकान साथी AI</h1>
+                    <p class="text-xs text-slate-300">स्मार्ट बिलिंग व व्यवसाय रिपोर्ट</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 space-x-reverse">
+                <button onclick="openApiKeyModal()" class="px-3 py-1.5 text-xs sm:text-sm bg-slate-700 hover:bg-slate-600 text-slate-100 rounded-lg transition-colors flex items-center gap-1.5 border border-slate-600">
+                    <i class="fa-solid fa-key text-amber-400"></i>
+                    <span class="hidden sm:inline">Gemini API कुंजी</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex-grow no-print">
+        
+        <!-- Tab Navigation Buttons -->
+        <div class="flex border-b border-slate-200 mb-6 bg-white p-1.5 rounded-xl shadow-sm overflow-x-auto">
+            <button id="tabBtnBilling" onclick="switchTab('billing')" class="flex-1 py-2.5 px-4 text-center font-semibold text-sm sm:text-base rounded-lg transition-all flex items-center justify-center gap-2 bg-navy-800 text-white shadow">
+                <i class="fa-solid fa-file-invoice"></i>
+                <span>नया बिल (Billing)</span>
+            </button>
+            <button id="tabBtnReports" onclick="switchTab('reports')" class="flex-1 py-2.5 px-4 text-center font-semibold text-sm sm:text-base text-slate-600 hover:text-navy-800 rounded-lg transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>बिक्री रिपोर्ट (Reports)</span>
+            </button>
+            <button id="tabBtnAi" onclick="switchTab('ai')" class="flex-1 py-2.5 px-4 text-center font-semibold text-sm sm:text-base text-slate-600 hover:text-navy-800 rounded-lg transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-robot text-emerald-600"></i>
+                <span>AI सहायक (Assistant)</span>
+            </button>
+        </div>
+
+        <!-- Notification Banner -->
+        <div id="toast" class="hidden mb-4 p-4 rounded-xl text-sm font-medium transition-all duration-300 shadow-sm flex items-center justify-between">
+            <span id="toastMessage"></span>
+            <button onclick="hideToast()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <!-- TAB 1: BILLING SECTION -->
+        <section id="tabBilling" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left Column: Item Entry Form -->
+            <div class="lg:col-span-5 bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80">
+                <h2 class="text-lg font-bold text-navy-800 border-b pb-3 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-cart-plus text-emerald-600"></i>
+                    सामग्री जोड़ें (Add Item)
+                </h2>
+
+                <form id="itemForm" onsubmit="addItemToBill(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">सामग्री का नाम (Item Name) *</label>
+                        <input type="text" id="itemName" required placeholder="जैसे: चीनी, आटा, फॉर्च्यून तेल..." class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm outline-none transition">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">मात्रा (Quantity) *</label>
+                            <input type="number" step="0.01" min="0.01" id="itemQty" required placeholder="1" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">इकाई (Unit)</label>
+                            <select id="itemUnit" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm outline-none transition bg-white">
+                                <option value="किग्रा (kg)">किग्रा (kg)</option>
+                                <option value="लीटर (litre)">लीटर (litre)</option>
+                                <option value="पीस (piece)">पीस (piece)</option>
+                                <option value="पैकेट (packet)">पैकेट (packet)</option>
+                                <option value="ग्राम (gm)">ग्राम (gm)</option>
+                                <option value="मीटर (m)">मीटर (m)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">प्रति इकाई दर (Price ₹) *</label>
+                            <input type="number" step="0.01" min="0" id="itemPrice" required placeholder="0.00" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">छूट (Discount %)</label>
+                            <input type="number" step="0.1" min="0" max="100" id="itemDiscount" placeholder="0" value="0" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm outline-none transition">
+                        </div>
+                    </div>
+
+                    <div class="pt-2 flex gap-3">
+                        <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm shadow">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>आइटम जोड़ें</span>
+                        </button>
+                        <button type="button" onclick="resetItemForm()" class="px-4 py-2.5 border border-slate-300 text-slate-600 hover:bg-slate-50 font-semibold rounded-lg text-sm transition">
+                            साफ़ करें
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Right Column: Current Bill Table & Total -->
+            <div class="lg:col-span-7 bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b pb-3 mb-4">
+                        <h2 class="text-lg font-bold text-navy-800 flex items-center gap-2">
+                            <i class="fa-solid fa-receipt text-navy-800"></i>
+                            वर्तमान बिल (Current Receipt)
+                        </h2>
+                        <span id="currentBillNo" class="text-xs bg-slate-100 text-slate-700 font-semibold px-2.5 py-1 rounded-full border">
+                            बिल # --
+                        </span>
+                    </div>
+
+                    <!-- Items Table -->
+                    <div class="overflow-x-auto max-h-72 mb-4 border rounded-xl">
+                        <table class="w-full text-left text-xs sm:text-sm">
+                            <thead class="bg-slate-50 text-slate-600 font-semibold border-b">
+                                <tr>
+                                    <th class="p-2.5">सामग्री</th>
+                                    <th class="p-2.5 text-center">मात्रा</th>
+                                    <th class="p-2.5 text-right">दर</th>
+                                    <th class="p-2.5 text-right">छूट</th>
+                                    <th class="p-2.5 text-right">कुल ₹</th>
+                                    <th class="p-2.5 text-center">हटाएं</th>
+                                </tr>
+                            </thead>
+                            <tbody id="billItemsTable" class="divide-y divide-slate-100">
+                                <tr>
+                                    <td colspan="6" class="p-6 text-center text-slate-400 italic">
+                                        अभी कोई आइटम नहीं जोड़ा गया है।
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Totals & Actions -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-3">
+                    <div class="flex justify-between text-xs sm:text-sm text-slate-600">
+                        <span>कुल मूल्य (Subtotal):</span>
+                        <span id="subTotalDisplay" class="font-semibold text-slate-800">₹0.00</span>
+                    </div>
+                    <div class="flex justify-between text-xs sm:text-sm text-emerald-600">
+                        <span>कुल छूट (Total Discount):</span>
+                        <span id="discountDisplay" class="font-semibold">- ₹0.00</span>
+                    </div>
+                    <div class="flex justify-between text-base sm:text-lg font-bold text-navy-800 border-t border-slate-200 pt-2">
+                        <span>देय राशि (Final Amount):</span>
+                        <span id="finalTotalDisplay" class="text-emerald-600">₹0.00</span>
+                    </div>
+
+                    <div class="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button onclick="printBill()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm shadow">
+                            <i class="fa-solid fa-print"></i>
+                            <span>प्रिंट / PDF डाउनलोड</span>
+                        </button>
+                        <button onclick="saveAndNewBill()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm shadow">
+                            <i class="fa-solid fa-check"></i>
+                            <span>सहेजें और नया बिल बनाएं</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: REPORTS & SALES HISTORY -->
+        <section id="tabReports" class="hidden space-y-6">
+            <!-- KPI Overview Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">आज की कुल बिक्री</p>
+                        <h3 id="kpiTodaySales" class="text-2xl font-extrabold text-emerald-600 mt-1">₹0.00</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 text-xl">
+                        <i class="fa-solid fa-indian-rupee-sign"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">कुल बिल संख्या</p>
+                        <h3 id="kpiTotalBills" class="text-2xl font-extrabold text-navy-800 mt-1">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-navy-800 text-xl">
+                        <i class="fa-solid fa-file-invoice"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">औसत बिल मूल्य</p>
+                        <h3 id="kpiAvgBill" class="text-2xl font-extrabold text-blue-600 mt-1">₹0.00</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 text-xl">
+                        <i class="fa-solid fa-calculator"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales History Table -->
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b pb-4 mb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-navy-800">बिक्री इतिहास (Saved Bills History)</h2>
+                        <p class="text-xs text-slate-500">आपके सहेजे गए सभी बिलों की सूची</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="exportCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-3.5 rounded-lg text-xs sm:text-sm transition flex items-center gap-1.5 shadow">
+                            <i class="fa-solid fa-file-excel"></i>
+                            <span>एक्सेल/CSV डाउनलोड करें</span>
+                        </button>
+                        <button onclick="clearHistory()" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-semibold py-2 px-3 rounded-lg text-xs sm:text-sm transition">
+                            इतिहास साफ़ करें
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border rounded-xl">
+                    <table class="w-full text-left text-xs sm:text-sm">
+                        <thead class="bg-slate-50 text-slate-600 font-semibold border-b">
+                            <tr>
+                                <th class="p-3">बिल आईडी</th>
+                                <th class="p-3">दिनांक व समय</th>
+                                <th class="p-3">कुल आइटम</th>
+                                <th class="p-3 text-right">कुल छूट</th>
+                                <th class="p-3 text-right">कुल राशि ₹</th>
+                                <th class="p-3 text-center">कार्रवाई</th>
+                            </tr>
+                        </thead>
+                        <tbody id="salesHistoryTable" class="divide-y divide-slate-100">
+                            <tr>
+                                <td colspan="6" class="p-6 text-center text-slate-400 italic">
+                                    कोई पुराना बिल इतिहास उपलब्ध नहीं है।
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: GEMINI AI ASSISTANT -->
+        <section id="tabAi" class="hidden space-y-6">
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80">
+                <div class="flex items-center justify-between border-b pb-4 mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-navy-800">दुकान साथी AI सलाह</h2>
+                            <p class="text-xs text-slate-500">Gemini AI संचालित व्यापार सहायक</p>
+                        </div>
+                    </div>
+                    <span id="aiApiKeyStatus" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border">
+                        स्मार्ट नियम मोड (निशुल्क)
+                    </span>
+                </div>
+
+                <!-- Pre-built AI Action Triggers -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+                    <button onclick="askAiPrompt('sales_analysis')" class="p-3 text-left border rounded-xl hover:border-emerald-500 hover:bg-emerald-50/40 transition group">
+                        <div class="flex items-center gap-2 font-semibold text-sm text-navy-800 group-hover:text-emerald-700">
+                            <i class="fa-solid fa-chart-pie text-emerald-600"></i>
+                            <span>बिक्री का विश्लेषण करें</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">हाल ही की बिक्री डेटा से लाभ और ट्रेंड समझें</p>
+                    </button>
+
+                    <button onclick="askAiPrompt('profit_tips')" class="p-3 text-left border rounded-xl hover:border-emerald-500 hover:bg-emerald-50/40 transition group">
+                        <div class="flex items-center gap-2 font-semibold text-sm text-navy-800 group-hover:text-emerald-700">
+                            <i class="fa-solid fa-lightbulb text-amber-500"></i>
+                            <span>मुनाफा बढ़ाने के सुझाव</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">दुकान की बिक्री व मार्जिन बढ़ाने के उपाय</p>
+                    </button>
+
+                    <button onclick="askAiPrompt('stock_advice')" class="p-3 text-left border rounded-xl hover:border-emerald-500 hover:bg-emerald-50/40 transition group">
+                        <div class="flex items-center gap-2 font-semibold text-sm text-navy-800 group-hover:text-emerald-700">
+                            <i class="fa-solid fa-boxes-packing text-blue-600"></i>
+                            <span>स्टॉक सलाह</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">कौन सा सामान अधिक बिक रहा है?</p>
+                    </button>
+                </div>
+
+                <!-- Chat Messages Display -->
+                <div id="aiChatBox" class="h-80 overflow-y-auto border rounded-xl p-4 bg-slate-50 space-y-3 mb-4">
+                    <div class="bg-white p-3.5 rounded-xl border border-slate-200 max-w-2xl shadow-2xs">
+                        <p class="text-xs font-bold text-emerald-700 mb-1">दुकान साथी AI:</p>
+                        <p class="text-xs sm:text-sm text-slate-700">
+                            नमस्कार! मैं आपका AI दुकान सहायक हूँ। आप अपनी दुकान की बिक्री, स्टॉक, या मुनाफा बढ़ाने के बारे में कोई भी प्रश्न हिंदी में पूछ सकते हैं।
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Input Box with Voice & Send -->
+                <div class="flex items-center gap-2">
+                    <input type="text" id="aiUserInput" placeholder="यहाँ प्रश्न लिखें (जैसे: चीनी की बिक्री कैसे बढ़ाएं?)..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-xs sm:text-sm outline-none">
+                    <button onclick="toggleVoiceInput()" id="voiceBtn" title="आवाज़ से बोलें" class="p-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl transition">
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+                    <button onclick="sendAiMessage()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5 shadow">
+                        <span>पूछें</span>
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Printable Receipt Template Hidden in Layout -->
+    <div id="printableReceipt" class="hidden">
+        <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
+            <h2 style="font-size: 16px; font-weight: bold; margin: 0;">दुकान साथी स्टोर</h2>
+            <p style="margin: 2px 0 0 0; font-size: 10px;">ग्राहक रसीद / Cash Receipt</p>
+            <p id="printBillMeta" style="margin: 2px 0 0 0; font-size: 10px;"></p>
+        </div>
+
+        <table style="width: 100%; text-align: left; border-collapse: collapse; font-size: 11px;">
+            <thead>
+                <tr style="border-bottom: 1px solid #000;">
+                    <th style="padding: 2px 0;">सामग्री</th>
+                    <th style="padding: 2px 0; text-align: center;">मात्रा</th>
+                    <th style="padding: 2px 0; text-align: right;">दर</th>
+                    <th style="padding: 2px 0; text-align: right;">कुल</th>
+                </tr>
+            </thead>
+            <tbody id="printItemsList"></tbody>
+        </table>
+
+        <div style="border-top: 1px dashed #000; margin-top: 8px; padding-top: 6px; font-size: 11px;">
+            <div style="display: flex; justify-content: space-between;">
+                <span>कुल (Subtotal):</span>
+                <span id="printSubtotal">₹0.00</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span>छूट (Discount):</span>
+                <span id="printDiscount">- ₹0.00</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 13px; margin-top: 4px; border-top: 1px solid #000; padding-top: 4px;">
+                <span>कुल देय (Final Amount):</span>
+                <span id="printFinalTotal">₹0.00</span>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 12px; font-size: 10px;">
+            <p style="margin:0;">धन्यवाद! फिर पधारें।</p>
+        </div>
+    </div>
+
+    <!-- API Key Settings Modal -->
+    <div id="apiKeyModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-navy-800 text-lg">Gemini API कुंजी दर्ज करें</h3>
+                <button onclick="closeApiKeyModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-xs text-slate-600 mb-4 leading-relaxed">
+                वास्तविक Gemini AI उत्तर प्राप्त करने के लिए अपनी API Key दर्ज करें। यदि Key नहीं है, तो ऐप स्मार्ट इन-बिल्ट एनालाइज़र का उपयोग करेगा।
+            </p>
+            <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 text-sm outline-none mb-4">
+            <div class="flex justify-end gap-2">
+                <button onclick="closeApiKeyModal()" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-sm">रद्द करें</button>
+                <button onclick="saveApiKey()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold">सहेजें</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application JavaScript Logic -->
+    <script>
+        // Data State Management
+        let currentBill = {
+            id: generateBillId(),
+            timestamp: new Date().toISOString(),
+            items: [],
+            subtotal: 0,
+            discount: 0,
+            finalTotal: 0
+        };
+
+        let salesHistory = [];
+        let geminiApiKey = localStorage.getItem('dukansaathi_gemini_key') || '';
+
+        // Initial Load Event
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSalesHistory();
+            updateBillDisplay();
+            updateKPIs();
+            checkApiKeyStatus();
+
+            // Handle ENTER key in AI chat
+            document.getElementById('aiUserInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendAiMessage();
+            });
+        });
+
+        // Helper: Bill ID Generator
+        function generateBillId() {
+            return 'DS-' + Math.floor(100000 + Math.random() * 900000);
+        }
+
+        // Tab Switching Logic
+        function switchTab(tab) {
+            const tabs = ['billing', 'reports', 'ai'];
+            tabs.forEach(t => {
+                const sec = document.getElementById('tab' + capitalize(t));
+                const btn = document.getElementById('tabBtn' + capitalize(t));
+                if (t === tab) {
+                    sec.classList.remove('hidden');
+                    btn.className = 'flex-1 py-2.5 px-4 text-center font-semibold text-sm sm:text-base rounded-lg transition-all flex items-center justify-center gap-2 bg-navy-800 text-white shadow';
+                } else {
+                    sec.classList.add('hidden');
+                    btn.className = 'flex-1 py-2.5 px-4 text-center font-semibold text-sm sm:text-base text-slate-600 hover:text-navy-800 rounded-lg transition-all flex items-center justify-center gap-2';
+                }
+            });
+            if (tab === 'reports') renderSalesHistoryTable();
+        }
+
+        function capitalize(s) {
+            return s.charAt(0).toUpperCase() + s.slice(1);
+        }
+
+        // Add Item to Current Bill
+        function addItemToBill(event) {
+            event.preventDefault();
+            const name = document.getElementById('itemName').value.trim();
+            const qty = parseFloat(document.getElementById('itemQty').value);
+            const unit = document.getElementById('itemUnit').value;
+            const price = parseFloat(document.getElementById('itemPrice').value);
+            const discountPct = parseFloat(document.getElementById('itemDiscount').value) || 0;
+
+            if (!name || isNaN(qty) || isNaN(price)) {
+                showToast('कृपया सभी आवश्यक विवरण सही से भरें।', 'bg-red-100 text-red-800');
+                return;
+            }
+
+            const itemSubtotal = qty * price;
+            const itemDiscount = (itemSubtotal * discountPct) / 100;
+            const itemFinal = itemSubtotal - itemDiscount;
+
+            const newItem = {
+                id: Date.now(),
+                name,
+                qty,
+                unit,
+                price,
+                discountPct,
+                discountAmt: itemDiscount,
+                finalAmt: itemFinal
+            };
+
+            currentBill.items.push(newItem);
+            recalculateTotals();
+            updateBillDisplay();
+            resetItemForm();
+            showToast('सामग्री सफलता से जोड़ी गई!', 'bg-emerald-100 text-emerald-800');
+        }
+
+        // Recalculate Bill Totals
+        function recalculateTotals() {
+            currentBill.subtotal = currentBill.items.reduce((sum, item) => sum + (item.qty * item.price), 0);
+            currentBill.discount = currentBill.items.reduce((sum, item) => sum + item.discountAmt, 0);
+            currentBill.finalTotal = currentBill.subtotal - currentBill.discount;
+        }
+
+        // Update Bill Render UI
+        function updateBillDisplay() {
+            document.getElementById('currentBillNo').innerText = 'बिल #' + currentBill.id;
+            const tableBody = document.getElementById('billItemsTable');
+
+            if (currentBill.items.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="p-6 text-center text-slate-400 italic">
+                            अभी कोई आइटम नहीं जोड़ा गया है।
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tableBody.innerHTML = currentBill.items.map((item, index) => `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-2.5 font-medium text-slate-800">${escapeHtml(item.name)}</td>
+                        <td class="p-2.5 text-center">${item.qty} ${item.unit}</td>
+                        <td class="p-2.5 text-right">₹${item.price.toFixed(2)}</td>
+                        <td class="p-2.5 text-right text-emerald-600">₹${item.discountAmt.toFixed(2)}</td>
+                        <td class="p-2.5 text-right font-semibold">₹${item.finalAmt.toFixed(2)}</td>
+                        <td class="p-2.5 text-center">
+                            <button onclick="removeItemFromBill(${index})" class="text-red-500 hover:text-red-700 p-1">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            document.getElementById('subTotalDisplay').innerText = '₹' + currentBill.subtotal.toFixed(2);
+            document.getElementById('discountDisplay').innerText = '- ₹' + currentBill.discount.toFixed(2);
+            document.getElementById('finalTotalDisplay').innerText = '₹' + currentBill.finalTotal.toFixed(2);
+        }
+
+        function removeItemFromBill(index) {
+            currentBill.items.splice(index, 1);
+            recalculateTotals();
+            updateBillDisplay();
+            showToast('सामग्री हटाई गई।', 'bg-slate-100 text-slate-800');
+        }
+
+        function resetItemForm() {
+            document.getElementById('itemForm').reset();
+            document.getElementById('itemDiscount').value = "0";
+            document.getElementById('itemName').focus();
+        }
+
+        // Save Current Bill & Start New
+        function saveAndNewBill() {
+            if (currentBill.items.length === 0) {
+                showToast('बिल खाली है! पहले आइटम जोड़ें।', 'bg-amber-100 text-amber-800');
+                return;
+            }
+
+            salesHistory.push({ ...currentBill });
+            saveSalesHistory();
+            updateKPIs();
+
+            // Reset Current Bill State
+            currentBill = {
+                id: generateBillId(),
+                timestamp: new Date().toISOString(),
+                items: [],
+                subtotal: 0,
+                discount: 0,
+                finalTotal: 0
+            };
+
+            updateBillDisplay();
+            showToast('बिल सहेजा गया और नया बिल तैयार है!', 'bg-emerald-100 text-emerald-800');
+        }
+
+        // Print Bill Function
+        function printBill() {
+            if (currentBill.items.length === 0) {
+                showToast('प्रिंट करने के लिए कोई आइटम नहीं है।', 'bg-amber-100 text-amber-800');
+                return;
+            }
+
+            const printMeta = document.getElementById('printBillMeta');
+            printMeta.innerText = `बिल नं: ${currentBill.id} | दिनांक: ${new Date().toLocaleDateString('hi-IN')}`;
+
+            const printItems = document.getElementById('printItemsList');
+            printItems.innerHTML = currentBill.items.map(item => `
+                <tr style="border-bottom: 1px border #eee;">
+                    <td style="padding: 3px 0;">${escapeHtml(item.name)}</td>
+                    <td style="padding: 3px 0; text-align: center;">${item.qty} ${item.unit}</td>
+                    <td style="padding: 3px 0; text-align: right;">₹${item.price.toFixed(2)}</td>
+                    <td style="padding: 3px 0; text-align: right;">₹${item.finalAmt.toFixed(2)}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('printSubtotal').innerText = '₹' + currentBill.subtotal.toFixed(2);
+            document.getElementById('printDiscount').innerText = '- ₹' + currentBill.discount.toFixed(2);
+            document.getElementById('printFinalTotal').innerText = '₹' + currentBill.finalTotal.toFixed(2);
+
+            const receiptElem = document.getElementById('printableReceipt');
+            receiptElem.classList.remove('hidden');
+            window.print();
+            receiptElem.classList.add('hidden');
+        }
+
+        // Local Storage & Reports Management
+        function saveSalesHistory() {
+            localStorage.setItem('dukansaathi_sales_history', JSON.stringify(salesHistory));
+        }
+
+        function loadSalesHistory() {
+            const saved = localStorage.getItem('dukansaathi_sales_history');
+            if (saved) {
+                try {
+                    salesHistory = JSON.parse(saved);
+                } catch(e) {
+                    salesHistory = [];
+                }
+            }
+        }
+
+        function updateKPIs() {
+            const todayStr = new Date().toDateString();
+            const todayBills = salesHistory.filter(b => new Date(b.timestamp).toDateString() === todayStr);
+
+            const todayTotal = todayBills.reduce((sum, b) => sum + b.finalTotal, 0);
+            const totalBillsCount = salesHistory.length;
+            const overallTotal = salesHistory.reduce((sum, b) => sum + b.finalTotal, 0);
+            const avgBillVal = totalBillsCount > 0 ? (overallTotal / totalBillsCount) : 0;
+
+            document.getElementById('kpiTodaySales').innerText = '₹' + todayTotal.toFixed(2);
+            document.getElementById('kpiTotalBills').innerText = totalBillsCount;
+            document.getElementById('kpiAvgBill').innerText = '₹' + avgBillVal.toFixed(2);
+        }
+
+        function renderSalesHistoryTable() {
+            const tbody = document.getElementById('salesHistoryTable');
+            if (salesHistory.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="p-6 text-center text-slate-400 italic">
+                            कोई पुराना बिल इतिहास उपलब्ध नहीं है।
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = [...salesHistory].reverse().map(bill => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3 font-semibold text-slate-800">${bill.id}</td>
+                    <td class="p-3 text-slate-600">${new Date(bill.timestamp).toLocaleString('hi-IN')}</td>
+                    <td class="p-3">${bill.items.length} आइटम</td>
+                    <td class="p-3 text-right text-emerald-600">₹${bill.discount.toFixed(2)}</td>
+                    <td class="p-3 text-right font-bold text-slate-900">₹${bill.finalTotal.toFixed(2)}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="reprintBill('${bill.id}')" class="text-slate-600 hover:text-navy-800 p-1" title="देखें/प्रिंट">
+                            <i class="fa-solid fa-print"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function reprintBill(billId) {
+            const found = salesHistory.find(b => b.id === billId);
+            if (!found) return;
+
+            currentBill = { ...found };
+            recalculateTotals();
+            updateBillDisplay();
+            switchTab('billing');
+            showToast(`बिल #${billId} लोड हो गया है।`, 'bg-blue-100 text-blue-800');
+        }
+
+        function clearHistory() {
+            if (salesHistory.length === 0) return;
+            salesHistory = [];
+            saveSalesHistory();
+            updateKPIs();
+            renderSalesHistoryTable();
+            showToast('बिक्री इतिहास सफलतापूर्वक साफ़ किया गया।', 'bg-slate-100 text-slate-800');
+        }
+
+        // Export Sales Report to CSV
+        function exportCSV() {
+            if (salesHistory.length === 0) {
+                showToast('निर्यात (Export) करने के लिए कोई बिक्री डेटा नहीं है।', 'bg-amber-100 text-amber-800');
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,Bill ID,Date Time,Item Count,Subtotal,Discount,Final Total\n";
+
+            salesHistory.forEach(b => {
+                const dt = new Date(b.timestamp).toLocaleString().replace(/,/g, '');
+                csvContent += `${b.id},${dt},${b.items.length},${b.subtotal},${b.discount},${b.finalTotal}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Dukaan_Saathi_Sales_Report_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Gemini AI Integration Section
+        function checkApiKeyStatus() {
+            const statusElem = document.getElementById('aiApiKeyStatus');
+            if (geminiApiKey) {
+                statusElem.innerText = 'Gemini AI एक्टिवेटर सक्षम';
+                statusElem.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200';
+            } else {
+                statusElem.innerText = 'स्मार्ट नियम मोड (निशुल्क)';
+                statusElem.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border';
+            }
+        }
+
+        function openApiKeyModal() {
+            document.getElementById('apiKeyInput').value = geminiApiKey;
+            document.getElementById('apiKeyModal').classList.remove('hidden');
+        }
+
+        function closeApiKeyModal() {
+            document.getElementById('apiKeyModal').classList.add('hidden');
+        }
+
+        function saveApiKey() {
+            geminiApiKey = document.getElementById('apiKeyInput').value.trim();
+            localStorage.setItem('dukansaathi_gemini_key', geminiApiKey);
+            checkApiKeyStatus();
+            closeApiKeyModal();
+            showToast('Gemini API कुंजी सफलतापूर्वक सहेजी गई!', 'bg-emerald-100 text-emerald-800');
+        }
+
+        function askAiPrompt(type) {
+            let promptText = "";
+            if (type === 'sales_analysis') {
+                promptText = "मेरी हालिया बिक्री और बिलिंग पैटर्न का विश्लेषण करें और मुख्य अंतर्दृष्टि (insights) बताएं।";
+            } else if (type === 'profit_tips') {
+                promptText = "मेरी किराना/रिटेल दुकान के लिए मुनाफा और ग्राहक संतुष्टि बढ़ाने के 4 बेहतरीन सुझाव दें।";
+            } else if (type === 'stock_advice') {
+                promptText = "मुझे स्टॉक प्रबंधन और तेजी से बिकने वाले सामानों को प्रबंधित करने की सलाह दें।";
+            }
+
+            document.getElementById('aiUserInput').value = promptText;
+            sendAiMessage();
+        }
+
+        async function sendAiMessage() {
+            const inputElem = document.getElementById('aiUserInput');
+            const userQuery = inputElem.value.trim();
+            if (!userQuery) return;
+
+            appendChatMessage('आप', userQuery, 'user');
+            inputElem.value = '';
+
+            const loadingId = appendChatMessage('दुकान साथी AI', 'विचार कर रहा है...', 'ai', true);
+
+            // Fetch live context stats
+            const totalSalesAmt = salesHistory.reduce((s, b) => s + b.finalTotal, 0);
+            const totalBillsCount = salesHistory.length;
+
+            if (geminiApiKey) {
+                // Call Google Gemini API
+                try {
+                    const systemPrompt = `आप "दुकान साथी AI" हैं - एक विशेषज्ञ भारतीय रिटेल व्यवसाय सलाहकार। उपयोगकर्ता की दुकान का विवरण: कुल बिल=${totalBillsCount}, कुल बिक्री=₹${totalSalesAmt}। सभी उत्तर हमेशा स्पष्ट, व्यावहारिक और हिंदी भाषा में दें। संक्षिप्त व बिंदुओं में उत्तर दें।`;
+                    
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${geminiApiKey}`;
+                    
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: userQuery }] }],
+                            systemInstruction: { parts: [{ text: systemPrompt }] }
+                        })
+                    });
+
+                    const data = await response.json();
+                    removeChatMessage(loadingId);
+
+                    if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+                        appendChatMessage('दुकान साथी AI', data.candidates[0].content.parts[0].text, 'ai');
+                    } else {
+                        appendChatMessage('दुकान साथी AI', 'क्षमा करें, AI उत्तर प्राप्त करने में समस्या हुई। कृपया अपनी API कुंजी जांचें।', 'ai');
+                    }
+                } catch(err) {
+                    removeChatMessage(loadingId);
+                    appendChatMessage('दुकान साथी AI', 'नेटवर्क या API में त्रुटि हुई। स्मार्ट नियम-आधारित सलाह पर स्विच किया जा रहा है।', 'ai');
+                    fallbackAiResponse(userQuery);
+                }
+            } else {
+                // Smart Rule-based Fallback AI Engine
+                setTimeout(() => {
+                    removeChatMessage(loadingId);
+                    fallbackAiResponse(userQuery);
+                }, 600);
+            }
+        }
+
+        function fallbackAiResponse(query) {
+            const q = query.toLowerCase();
+            let response = "";
+
+            const totalSales = salesHistory.reduce((s, b) => s + b.finalTotal, 0);
+            const billCount = salesHistory.length;
+
+            if (q.includes('बिक्री') || q.includes('विश्लेषण') || q.includes('sales')) {
+                response = `📊 **बिक्री विश्लेषण रिपोर्ट:**\n- आपने कुल **${billCount} बिल** बनाए हैं।\n- आपकी कुल दर्ज बिक्री **₹${totalSales.toFixed(2)}** है।\n- सलाह: व्यस्त समय में लोकप्रिय सामान (जैसे दूध, चीनी, आटा) काउंटर के पास रखें।`;
+            } else if (q.includes('मुनाफा') || q.includes('लाभ') || q.includes('profit')) {
+                response = `💡 **मुनाफा बढ़ाने के मुख्य सुझाव:**\n1. **कॉम्बो ऑफर दें:** जैसे 5 किग्रा आटा के साथ 10% छूट वाला तेल पैकेज।\n2. **धीमे बिकने वाले सामान:** जिन सामानों की बिक्री कम है, उनपर छोटा डिस्काउंट देकर पुराना स्टॉक खाली करें।\n3. **डिजिटल पेमेंट बहीखाता:** ग्राहकों को डिजिटल रसीद और त्वरित सेवा दें।`;
+            } else if (q.includes('स्टॉक') || q.includes('सामान') || q.includes('stock')) {
+                response = `📦 **स्मार्ट स्टॉक सलाह:**\n- दैनिक खपत वाले राशन का स्टॉक हफ्ते में कम से कम 2 बार री-स्टॉक करें।\n- एक्सपायरी डेट वाले प्रॉडक्ट्स पर FIFO (First-In, First-Out) नियम लागू करें।`;
+            } else {
+                response = `धन्यवाद! आपकी दुकान में अभी **${billCount} बिलों** के साथ **₹${totalSales.toFixed(2)}** की कुल बिक्री दर्ज है। अपनी बिक्री बढ़ाने के लिए नियमित रूप से डिस्काउंट ऑफर्स और तेज बिलिंग सेवा का उपयोग करें।`;
+            }
+
+            appendChatMessage('दुकान साथी AI', response, 'ai');
+        }
+
+        function appendChatMessage(sender, text, type, isLoading = false) {
+            const chatBox = document.getElementById('aiChatBox');
+            const msgId = 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4);
+
+            const isUser = type === 'user';
+            const html = `
+                <div id="${msgId}" class="flex ${isUser ? 'justify-end' : 'justify-start'}">
+                    <div class="${isUser ? 'bg-navy-800 text-white' : 'bg-white border border-slate-200 text-slate-800'} p-3.5 rounded-xl max-w-xl text-xs sm:text-sm shadow-2xs">
+                        <p class="font-bold text-xs ${isUser ? 'text-emerald-300' : 'text-emerald-700'} mb-1">${sender}:</p>
+                        <div class="whitespace-pre-line leading-relaxed">${escapeHtml(text)}</div>
+                    </div>
+                </div>
+            `;
+
+            chatBox.insertAdjacentHTML('beforeend', html);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            return msgId;
+        }
+
+        function removeChatMessage(id) {
+            const elem = document.getElementById(id);
+            if (elem) elem.remove();
+        }
+
+        // Voice Input Functionality
+        function toggleVoiceInput() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                showToast('आपके ब्राउज़र में आवाज़ पहचान (Voice Input) समर्थित नहीं है।', 'bg-amber-100 text-amber-800');
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'hi-IN';
+
+            const voiceBtn = document.getElementById('voiceBtn');
+            voiceBtn.classList.add('animate-pulse', 'bg-red-500', 'text-white');
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('aiUserInput').value = transcript;
+                voiceBtn.classList.remove('animate-pulse', 'bg-red-500', 'text-white');
+                sendAiMessage();
+            };
+
+            recognition.onerror = () => {
+                voiceBtn.classList.remove('animate-pulse', 'bg-red-500', 'text-white');
+                showToast('आवाज़ सुनने में असमर्थ, कृपया पुनः प्रयास करें।', 'bg-red-100 text-red-800');
+            };
+
+            recognition.onend = () => {
+                voiceBtn.classList.remove('animate-pulse', 'bg-red-500', 'text-white');
+            };
+
+            recognition.start();
+        }
+
+        // UI Toast Message Utility
+        function showToast(msg, bgClasses = 'bg-slate-800 text-white') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMessage');
+            toast.className = `mb-4 p-3.5 rounded-xl text-xs sm:text-sm font-medium transition-all shadow-sm flex items-center justify-between ${bgClasses}`;
+            toastMsg.innerText = msg;
+            toast.classList.remove('hidden');
+
+            setTimeout(() => {
+                hideToast();
+            }, 3500);
+        }
+
+        function hideToast() {
+            document.getElementById('toast').classList.add('hidden');
+        }
+
+        // Safety HTML Escaper
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
+```
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
