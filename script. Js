@@ -30,3 +30,14 @@ app.post('/api/products', (req, res) => {
     if (!category || !name || !price) {
         return res.status(400).json({ error: 'कैटेगरी, नाम और कीमत भरना अनिवार्य है!' });
     }
+API Key 4
+Project
+Project ID
+gen-lang-client-0597808081
+Created
+Oct 18, 2026
+Billing tier
+Free tier
+...dL5g
+Gemini API Key 3
+Project
