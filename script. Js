@@ -31,7 +31,13 @@ app.post('/api/products', (req, res) => {
         return res.status(400).json({ error: 'कैटेगरी, नाम और कीमत भरना अनिवार्य है!' });
     }
  API Key यहाँ सुरक्षित तरीके से रखें
-const API_KEY = "यहाँ_अपनी_एपिआई_की_डालें";
+const gemkey3
+Project
+Project ID
+gen-lang-client-0597808081
+Created
+Sep 9, 2026
+Billing tier
 const API_URL = "https://your-backend-or-robot-api.com/endpoint";
 
 // सर्वर या मशीन से डेटा भेजने या मँगवाने का फंक्शन
