@@ -1,4 +1,4 @@
-('/healthz', (req, res) => {
+healthz', (req, res) => {
   // अगर सब सही है तो 200 OK
 app = express();
 app.use(express.json());
