@@ -1,7 +1,22 @@
-app.get('/healthz', (req, res) => {
+('/healthz', (req, res) => {
   // अगर सब सही है तो 200 OK
 app = express();
 app.use(express.json());
+express();
+app.use(express.json());
+
+// उत्पादों (Products) को स्टोर करने के लिए डेटाबेस एरे 
+// (इसे बाद में MongoDB या किसी परमानेंट डेटाबेस से जोड़ा जा सकता है)
+let products = [];
+
+// 1. नया प्रोडक्ट जोड़ने की API (POST /api/products)
+app.post('/api/products', (req, res) => {
+    const { category, name, unit, price, stock, customSpecs } = req.body;
+    
+    // जाँच करें कि जरूरी जानकारी दी गई है या नहीं
+    if (!category || !name || !price) {
+        return res.status(400).json({ error: 'कैटेगरी, नाम और कीमत भरना अनिवार्य है!' });
+    }
 
 // उत्पादों (Products) को स्टोर करने के लिए डेटाबेस एरे 
 // (इसे बाद में MongoDB या किसी परमानेंट डेटाबेस से जोड़ा जा सकता है)
