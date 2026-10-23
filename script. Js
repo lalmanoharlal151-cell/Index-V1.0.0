@@ -1,1 +1,2 @@
-
+app.get('/healthz', (req, res) => {
+  // अगर सब सही है तो 200 OK
