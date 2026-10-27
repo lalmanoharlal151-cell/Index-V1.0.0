@@ -58,6 +58,59 @@ def generate_bill(request: BillRequest):
     "status": "Success",
     "total_amount": total_amount,
     "bill_details": bill_details
-}
+}from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+import qrcode
+import io
+import base64
+
+app = FastAPI(title="All In One Pro - Banking API")
+
+class PaymentRequest(BaseModel):
+    upi_id: str
+    name: str
+    amount: float
+    note: str = "Payment for Bill"
+
+@app.post("/api/banking/generate-upi-qr")
+def generate_upi_qr(data: PaymentRequest):
+    """
+    ग्राहकों के लिए UPI QR कोड जनरेट करता है (GPay, PhonePe, Paytm सपोर्टेड)
+    """
+    try:
+        # UPI पेमेंट लिंक बनाना
+        upi_link = f"upi://pay?pa={data.upi_id}&pn={data.name}&am={data.amount}&cu=INR&tn={data.note}"
+        
+        # QR कोड इमेज तैयार करना
+        qr = qrcode.QRCode(version=1, box_size=10, border=4)
+        qr.add_data(upi_link)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+        
+        # Base64 इमेज स्ट्रिंग में बदलना ताकि फ्रंटएंड आसानी से दिखा सके
+        buffer = io.BytesIO()
+        img.save(buffer, format="PNG")
+        img_str = base64.b64encode(buffer.getvalue()).decode("utf-8")
+        
+        return {
+            "status": "success",
+            "upi_link": upi_link,
+            "qr_image_base64": f"data:image/png;base64,{img_str}"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/banking/check-status/{transaction_id}")
+def check_transaction_status(transaction_id: str):
+    """
+    भुगतान की स्थिति जांचने के लिए API एंडपॉइंट
+    """
+    # यहाँ आप Razorpay / Cashfree / PhonePe API के साथ स्टेटस वेरीफाई कर सकती हैं
+    return {
+        "transaction_id": transaction_id,
+        "status": "SUCCESS",
+        "message": "भुगतान सफलतापूर्वक प्राप्त हुआ!"
+    }
+
 
 
