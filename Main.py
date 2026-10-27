@@ -54,5 +54,10 @@ def generate_bill(request: BillRequest):
         "status": "Success",
         "bill_details": bill_details,
         "grand_total": total_amount
-    }
+    }return {
+    "status": "Success",
+    "total_amount": total_amount,
+    "bill_details": bill_details
+}
+
 
