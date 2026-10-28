@@ -80,7 +80,14 @@
     </div>
 
     <script>
-        // JavaScript Logic
+        // const actionBtn = document.getElementById('actionBtn');
+const outputDiv = document.getElementById('output');
+
+actionBtn.addEventListener('click', function() {
+  outputDiv.style.display = 'block';
+  outputDiv.innerHTML = 'सिस्टम स्थिति: सक्रिय (Active)';
+});
+
         document.getElementById('actionBtn').addEventListener('click', function() {
             const outputDiv = document.getElementById('output');
             outputDiv.style.display = 'block';
