@@ -1,1 +1,4 @@
+mkdir -p all-in-one-pro
+cd all-in-one-pro
+nano index.html
 
