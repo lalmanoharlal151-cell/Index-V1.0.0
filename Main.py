@@ -111,6 +111,35 @@ def check_transaction_status(transaction_id: str):
         "status": "SUCCESS",
         "message": "भुगतान सफलतापूर्वक प्राप्त हुआ!"
     }
+from flask import Flask, request, jsonify
+
+# यदि app = Flask(__name__) पहले से है, तो केवल यह रूट नीचे जोड़ें:
+
+@app.route('/api/society-billing', methods=['POST'])
+def society_billing():
+    data = request.json
+    society_name = data.get('society_name')
+    operator_name = data.get('operator_name')
+    units = float(data.get('units', 0))
+    rate = float(data.get('rate', 0))
+    status = data.get('status', 'Pending')
+    
+    # कुल बिल की गणना
+    total_amount = units * rate
+    
+    # प्रतिक्रिया (Response)
+    return jsonify({
+        "status": "success",
+        "message": f"{society_name} के लिए बिल सफलतापूर्वक जनरेट हो गया है।",
+        "details": {
+            "society": society_name,
+            "operator": operator_name,
+            "units_supplied": units,
+            "rate_per_unit": rate,
+            "total_amount": total_amount,
+            "payment_status": status
+        }
+    })
 
 
 
