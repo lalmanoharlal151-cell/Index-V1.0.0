@@ -151,6 +151,18 @@ services:
   buildCommand: pip install -r requirements.txt
   startCommand: main. Py
   autoDeployTrigger: commit
+# Exported from Render on 2026-10-29T13:34:25Z
+version: "1"
+services:
+- type: web
+  name: all-in-one pro
+  runtime: python
+  repo: https://github.com/lalmanoharlal151-cell/all-in-one
+  plan: free
+  region: oregon
+  buildCommand: pip install -r requirements.txt
+  startCommand: main. Py
+  autoDeployTrigger: commit
 
 
 
