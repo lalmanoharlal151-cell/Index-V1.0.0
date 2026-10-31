@@ -1,1 +1,9 @@
+io
+import base64
+import qrcode
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 
+app = FastAPI(title="All in One Pro API")
+
+# --- Pydantic
