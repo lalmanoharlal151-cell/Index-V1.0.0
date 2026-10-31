@@ -1,5 +1,5 @@
 fastapi
 uvicon
-pydontic
-qricorn
+pydantic
+qricode
 pillow
