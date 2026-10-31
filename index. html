@@ -1,4 +1,17 @@
-<! 
+<! <!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Index-V1.0.0</title>
+<style>
+  h1, h4 {
+    color: #38bdf8;
+  }
+  .form-label {
+    color: #d1d5db;
+  }
+
         h1, h4 {
             color: #38bdf8;
         }
